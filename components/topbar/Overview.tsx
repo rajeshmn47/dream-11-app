@@ -87,7 +87,7 @@ export default function Overview({ navigation, livescore, matchId, match_details
                     <Text style={styles.brightText}>{match_details?.teamHomeName}
                         {'  '}v/s{'  '} {match_details?.teamAwayName}</Text>
                     <Text style={styles.brightText}>
-                       {getDisplayDate(match_details.date, 'i', date)}
+                       {match_details?.date&&getDisplayDate(match_details.date, 'i', date)}
                     </Text>
                 </View>
                 <Text style={styles.brightText}>Rs.{user?.wallet}</Text>
@@ -155,12 +155,12 @@ export default function Overview({ navigation, livescore, matchId, match_details
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#000000',
+        backgroundColor: '#202020',
         color: '#ffffff',
         padding: 10
     },
     top: {
-        backgroundColor: '#000',
+        backgroundColor: '#202020',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
         flexDirection: 'row',

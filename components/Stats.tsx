@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, StyleSheet, TouchableHighlight } from 'react-native';
+import { Button, Dimensions, ScrollView, StyleSheet, TouchableHighlight } from 'react-native';
 import { Text, FlatList, TextInput, View, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,12 +18,12 @@ export interface Contest {
     isViceCaptain: Boolean;
 }
 
-
+const width=Dimensions.get('window').width;
 export type Props = NativeStackScreenProps<RootStackParamList, "Captain">;
 export default function Stats({ matchdata, team, route }: { matchdata: any, team: any, route: any }) {
     const [tableHead, setTableHead] = useState<any[]>(['playerName', 'points']);
     const [tableTitle, setTableTitle] = useState(['playerName', 'points', 'c']);
-    const [widthArr, setWidthArr] = useState<any[]>([180, 180])
+    const [widthArr, setWidthArr] = useState<any[]>([width/2, width/2])
     const [tableData, setTableData] = useState([
         ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
         ['a', 'b', 'c', '1', '2', '3', '1', '2', '3'],
@@ -73,7 +73,7 @@ export default function Stats({ matchdata, team, route }: { matchdata: any, team
     return (
         <View style={styles.container}>
             <Table borderStyle={{ borderWidth: 1 }}>
-                <Row data={tableHead} flexArr={[1, 1, 1, 1]} style={styles.head} textStyle={styles.text} />
+                <Row data={tableHead} flexArr={[1, 1]} style={styles.head} textStyle={styles.text} />
             </Table>
             <ScrollView style={styles.dataWrapper}>
                 <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>

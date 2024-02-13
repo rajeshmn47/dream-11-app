@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, StyleSheet, TouchableHighlight } from 'react-native';
+import { Button, ScrollView, StyleSheet, TouchableHighlight, useWindowDimensions } from 'react-native';
 import { Text, FlatList, TextInput, View, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -20,9 +20,10 @@ export interface Contest {
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Captain">;
 export default function Scorecard({ data, livescore, g }: { data: any, g: any, livescore: any }) {
+    const width = useWindowDimensions().width
     const [tableHead, setTableHead] = useState<any[]>(['batter', 'r', 'b', '4s', '6s', 's/r']);
     const [tableTitle, setTableTitle] = useState(['playerName', 'points', 'c']);
-    const [widthArr, setWidthArr] = useState<any[]>([110, 50, 50, 50, 50, 50]);
+    const [widthArr, setWidthArr] = useState<any[]>([width * 2 / 7, width / 7, width / 7, width / 7, width / 7, width / 7]);
     const [homePlayers, setHomePlayers] = useState<any[]>([]);
     const [awayPlayers, setAwayPlayers] = useState<any[]>([])
     const [tableData, setTableData] = useState([
@@ -112,7 +113,7 @@ export default function Scorecard({ data, livescore, g }: { data: any, g: any, l
                 </CollapseHeader>
                 <CollapseBody>
                     <Table borderStyle={{ borderWidth: 1 }}>
-                        <Row data={tableHead} flexArr={[1.1, 0.5, 0.5, 0.5, 0.5, 0.5]} style={styles.head} textStyle={styles.text} />
+                        <Row data={tableHead} flexArr={[1, 0.5, 0.5, 0.5, 0.5, 0.5]} style={styles.head} textStyle={styles.text} />
                     </Table>
                     <ScrollView style={styles.dataWrapper}>
                         <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>

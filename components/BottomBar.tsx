@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 
 
 const w = Dimensions.get('window').width
+const height = Dimensions.get('window').height
 export default function BottomBar({ navigation, route }: { navigation: any, route: any }) {
     const { isAuthenticated, user } = useSelector((state: any) => state.user);
     const { height, width } = useWindowDimensions();
@@ -51,32 +52,31 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#3d7940',
         color: 'white',
-        height: 75,
+        height: "11%",
         alignItems: 'center',
         justifyContent: 'space-between',
         flexDirection: 'row',
         position: 'absolute',
         left: 0,
-        bottom: -85
+        bottom: "-1%"
     },
     iconContainer: {
         backgroundColor: '#3d7940',
         color: 'white',
-        height: 75,
-        padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
+        height:'100%',
+        width:w/4
     },
     selected: {
         backgroundColor: '#000000',
         color: 'white',
-        height: 75,
-        padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        width: w / 4
+        width: w / 4,
+        height:'100%'
     },
     match: {
         shadowColor: 'black',

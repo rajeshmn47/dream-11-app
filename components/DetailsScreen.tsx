@@ -120,7 +120,7 @@ const Item = ({ data, date, selectedTeam, selectTeams, handleClick }: { data: Co
                 </View>
                 <View style={styles.row}>
                     <View>
-                        <Icon name="trophy" />
+                        <Icon name="trophy" style={{ marginRight: 10 }} />
                     </View>
                     <Text>
                         {Math.floor((data.numWinners / data.totalSpots * 100))}%
@@ -242,7 +242,7 @@ const MyCoItem = ({ data, date, match, navigation }: { data: MyContest, date: an
                 </View>
                 <View style={styles.row}>
                     <View>
-                        <Icon name="trophy" />
+                        <Icon name="trophy" style={{ marginRight: 10 }} />
                     </View>
                     <Text>
                         {data.contest.prizeDetails.length / data.contest.totalSpots * 100}%
@@ -380,7 +380,9 @@ export default function DetailsScreen({ navigation, route }: Props) {
         { key: 'contests', title: 'All Contests' },
         { key: 'myContests', title: `My Contests(${myContests?.length > -1 && myContests?.length})` },
         { key: 'myTeams', title: `My Teams(${teams?.length})` },
-        { key: 'commentary', title: 'Commentary' }
+        { key: 'commentary', title: 'Commentary' },
+        { key: 'scorecard', title: 'scorecard' },
+        { key: 'stats', title: 'stats' }
     ]);
     const handleClick = (contest: any) => {
         setSelectTeams({ selected: true, team: null })
@@ -698,12 +700,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         color: 'white',
         flexDirection: 'row',
-        padding: 5,
+        paddingHorizontal: 10,
         borderRadius: 2,
         paddingBottom: 0
     },
     slider: {
-        paddingHorizontal: 5
+        paddingHorizontal: 10
     },
     wholeTeamContainer: {
         shadowColor: 'black',
@@ -835,7 +837,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         height: 50,
-        padding: 2
+        padding: 2,
+        paddingHorizontal: 10
     },
     myConMiddle: {
         justifyContent: 'space-between',
@@ -843,7 +846,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: 'rgb(246, 246, 246)',
         height: 50,
-        padding: 2
+        padding: 2,
+        paddingHorizontal: 10
     },
     conBottom: {
         justifyContent: 'space-between',
@@ -851,7 +855,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: 'rgb(246, 246, 246)',
         height: 50,
-        paddingHorizontal: 5
+        paddingHorizontal: 10
     },
     row: {
         justifyContent: 'space-between',
@@ -947,6 +951,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         padding: 3,
-        paddingHorizontal: 5
+        paddingHorizontal: 10
     }
 });

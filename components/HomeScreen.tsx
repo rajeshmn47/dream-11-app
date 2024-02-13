@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Text, FlatList, TextInput, View, Image, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ListRenderItem } from 'react-native';
@@ -58,10 +58,6 @@ export interface Match {
 }
 
 const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: any }) => {
-    const { userToken, user } = useSelector((state: any) => state.user);
-    const [uri, setUri] = React.useState(
-        'https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/not_existing.svg'
-    );
     const openPopup = () => {
         console.log(data.id, 'id')
         navigation.navigate('Detail', { matchId: data.id })
@@ -80,21 +76,23 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                             }
                             width="40"
                             height="40"
+                            style={{ marginRight: 10 }}
                             uri={data.teamHomeFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
                         />
-                        <Text>{data.home.code}</Text>
+                        <Text style={styles.code}>{data.home.code}</Text>
                     </View>
                     <View style={styles.matchDate}>
                         <Text style={styles.dateText}>{getDisplayDate(data.date, 'i', date)}</Text>
                     </View>
                     <View style={styles.team}>
-                        <Text>{data.away.code}</Text>
+                        <Text style={styles.code}>{data.away.code}</Text>
                         <SvgUri
                             onError={() =>
                                 console.log('error')
                             }
                             width="40"
                             height="40"
+                            style={{ marginLeft: 10 }}
                             uri={data.teamAwayFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
                         />
                     </View>
@@ -106,9 +104,8 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
         </TouchableOpacity>
     );
 }
-
+const { height, width } = Dimensions.get('window')
 export default function HomeScreen({ navigation, route }: Props) {
-    const { height, width } = useWindowDimensions();
     const dispatch: any = useDispatch();
     const [text, setText] = useState('');
     const [upcoming, setUpcoming] = useState<any[]>();
@@ -124,7 +121,7 @@ export default function HomeScreen({ navigation, route }: Props) {
         async function getupcoming() {
             setLoading(true);
             try {
-                const response = await fetch('https://backendforpuand-dream11.onrender.com/home');
+                const response = await fetch(`${URL}/home`);
                 const json: any = await response.json();
                 const a: [] = json.upcoming.results.sort(
                     (c: any, d: any) => new Date(c.date).valueOf() - new Date(d.date).valueOf()
@@ -215,7 +212,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         color: 'white',
         zIndex: 0,
-        height: 600,
+        height: "86.66%",
         width: "100%"
     },
     selectedTabTextStyle: {
@@ -239,23 +236,23 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 6,
         elevation: 14,
-        margin: 15,
+        marginHorizontal: 10,
+        marginVertical: 15,
         borderRadius: 10,
-        height: 150,
+        height: 160,
         backgroundColor: 'white',
         padding: 10,
-        paddingHorizontal: 5
+        paddingHorizontal: 10
     },
     team: {
-        flex: 1,
         backgroundColor: 'white',
         alignItems: 'center',
         justifyContent: 'space-between',
         color: 'white',
         flexDirection: 'row',
         height: 60,
-        padding: 10,
-        width: 40
+        padding: 0,
+        width: 103
     },
     subContainer: {
         flex: 1,
@@ -279,7 +276,7 @@ const styles = StyleSheet.create({
         color: 'white',
         flexDirection: 'row',
         height: 70,
-        padding: 5,
+        padding: 2,
         borderRadius: 2,
     },
     matchTop: {
@@ -292,16 +289,23 @@ const styles = StyleSheet.create({
         height: 40
     },
     matchDate: {
-        width: 100,
+        width: 130,
         fontSize: 10,
-        flex: 2,
-        alignItems: 'center'
+        alignItems: 'center',
+        fontWeight: '200'
     },
     dateText: {
         fontSize: 12,
-        color: 'rgb(94, 91, 91)'
+        color: 'rgb(130, 130, 130)'
     },
     title: {
         overflow: 'hidden',
+        fontSize: 14,
+        fontWeight: '200'
+    },
+    code: {
+        overflow: 'hidden',
+        fontSize: 14,
+        fontWeight: 'bold'
     }
 });

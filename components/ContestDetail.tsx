@@ -109,11 +109,11 @@ export default function ContestDetail({ navigation, route }: Props) {
     });
     const [open, setOpen] = useState<boolean>(false);
     const [modal, setModal] = React.useState(null);
-    const [tableHead, setTableHead] = useState<any[]>(['rank', 'winnings']);
+    const [tableHead, setTableHead] = useState<any[]>(['winnings', 'rank']);
     const [lTableHead, setLTableHead] = useState<any[]>(['All Teams', 'Points', 'Rank']);
     const [tableTitle, setTableTitle] = useState(['playerName', 'points', 'c']);
-    const [widthArr, setWidthArr] = useState<any[]>([180, 180]);
-    const [lWidthArr, setLWidthArr] = useState<any[]>([120, 120, 120])
+    const [widthArr, setWidthArr] = useState<any[]>([layout.width / 2, layout.width / 2]);
+    const [lWidthArr, setLWidthArr] = useState<any[]>([layout.width / 3, layout.width / 3, layout.width / 3])
     const [tableData, setTableData] = useState([
         ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
         ['a', 'b', 'c', '1', '2', '3', '1', '2', '3'],
@@ -211,7 +211,7 @@ export default function ContestDetail({ navigation, route }: Props) {
                                 key={index}
                                 data={rowData}
                                 widthArr={lWidthArr}
-                                style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
+                                style={[styles.row, index % 2 ? { backgroundColor: '#26793b' } : { backgroundColor: '#ffffff' }]}
                                 textStyle={styles.text}
                             />
                         ))
@@ -260,13 +260,13 @@ export default function ContestDetail({ navigation, route }: Props) {
                         </Text>
                     </View>
                     <View style={styles.conBottom}>
-                        <View style={styles.row}>
+                        <View>
 
                             <Text>
                                 ₹{Math.floor(myContest?.price / myContest?.totalSpots)}
                             </Text>
                         </View>
-                        <View style={styles.row}>
+                        <View style={styles.cRow}>
                             <View>
                                 <Icon name="trophy" />
                             </View>
@@ -277,22 +277,24 @@ export default function ContestDetail({ navigation, route }: Props) {
                         </View>
                     </View>
                 </View>
-                <TabView
-                    navigationState={{ index, routes }}
-                    renderScene={renderScene}
-                    onIndexChange={setIndex}
-                    initialLayout={{ width: layout.width }}
-                    overScrollMode={'auto'}
-                    renderTabBar={props => (
-                        <TabBar
-                            {...props}
-                            indicatorStyle={{ backgroundColor: 'white' }}
-                            tabStyle={{ width: 120 }}
-                            scrollEnabled={true}
-                            style={{ backgroundColor: 'blue' }}
-                        />
-                    )}
-                />
+                <View style={styles.tabContainer}>
+                    <TabView
+                        navigationState={{ index, routes }}
+                        renderScene={renderScene}
+                        onIndexChange={setIndex}
+                        initialLayout={{ width: layout.width }}
+                        overScrollMode={'auto'}
+                        renderTabBar={props => (
+                            <TabBar
+                                {...props}
+                                indicatorStyle={{ backgroundColor: 'white' }}
+                                tabStyle={{ width: layout.width / 2 }}
+                                scrollEnabled={true}
+                                style={{ backgroundColor: '#202020' }}
+                            />
+                        )}
+                    />
+                </View>
             </>
         </View>
     );
@@ -302,7 +304,15 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
         color: 'white',
-        zIndex: 0
+        flex: 1,
+        zIndex: 2
+    },
+    tabContainer: {
+        backgroundColor: 'white',
+        color: 'white',
+        zIndex: 1,
+        height: 600,
+        width: "100%"
     },
     contest: {
         shadowColor: 'black',
@@ -523,6 +533,12 @@ const styles = StyleSheet.create({
     row: {
         justifyContent: 'space-between',
         alignItems: 'center',
+        flexDirection: 'row',
+        backgroundColor: '#bebebe'
+    },
+    cRow: {
+        justifyContent: 'space-between',
+        alignItems: 'center',
         flexDirection: 'row'
     },
     circle: {
@@ -606,7 +622,7 @@ const styles = StyleSheet.create({
         marginBottom: 2
     },
     text: {
-        width: 270
+        textAlign: 'center'
     },
     spots: {
         display: 'flex',
@@ -616,7 +632,7 @@ const styles = StyleSheet.create({
         padding: 3,
         paddingHorizontal: 5
     },
-    head: { height: 40, backgroundColor: '#f1f8ff' },
+    head: { height: 40, backgroundColor: '#a9f19b', textAlign: 'center' },
     wrapper: { flexDirection: 'row' },
     title: { flex: 1, backgroundColor: '#f6f8fa' },
     header: { height: 50, backgroundColor: '#537791' },

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 
 const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 export default function Navbar() {
     const { isAuthenticated, user } = useSelector((state: any) => state.user);
@@ -52,10 +53,11 @@ export default function Navbar() {
 
 const styles = StyleSheet.create({
     container: {
+        marginTop: height/33,
         backgroundColor: 'black',
         color: 'white',
-        height: 100,
-        paddingVertical: 20,
+        height: "10%",
+        paddingVertical: 0,
         paddingHorizontal: 20,
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -64,22 +66,22 @@ const styles = StyleSheet.create({
     leftContainer: {
         backgroundColor: 'black',
         color: 'white',
-        height: 100,
+        height: height / 33,
         padding: 0,
         alignItems: 'center',
         justifyContent: 'flex-start',
         flexDirection: 'row',
-        width: (width-20) / 2
+        width: (width - 20) / 2
     },
     rightContainer: {
         backgroundColor: 'black',
         color: 'white',
-        height: 100,
+        height: "100%",
         padding: 0,
         alignItems: 'center',
         justifyContent: 'flex-end',
         flexDirection: 'row',
-        width: (width-30) / 2
+        width: (width - 30) / 2
     },
     match: {
         shadowColor: 'black',

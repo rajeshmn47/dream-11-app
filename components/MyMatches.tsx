@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import { ListRenderItem } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
-import SvgUri from 'react-native-svg-uri';
 import axios from "axios";
 import { getDisplayDate } from '../utils/dateFormat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,6 +12,7 @@ import { loadToken, logout } from '../actions/userAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootStackParamList } from './HomeScreen';
 import { URL } from '../constants/userConstants';
+import { SvgUri } from 'react-native-svg';
 import BottomBar from './BottomBar';
 import Navbar from './navbar/Navbar';
 import { Link } from '@react-navigation/native';
@@ -44,15 +44,31 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                 </View>
                 <View style={styles.teamContainer}>
                     <View style={styles.team}>
-                        <Image source={{ uri: data.teamHomeFlagUrl }} style={{ width: 15, height: 15 }} />
-                        <Text>{data.home.code}</Text>
+                        <SvgUri
+                            onError={() =>
+                                console.log('error')
+                            }
+                            width="40"
+                            height="40"
+                            style={{ marginRight: 10 }}
+                            uri={data.teamHomeFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
+                        />
+                        <Text style={styles.code}>{data.home.code}</Text>
                     </View>
                     <View style={styles.matchDate}>
                         <Text style={styles.dateText}>{getDisplayDate(data.date, 'i', date)}</Text>
                     </View>
                     <View style={styles.team}>
-                        <Text>{data.away.code}</Text>
-                        <Image source={{ uri: data.teamAwayFlagUrl }} style={{ width: 15, height: 15 }} />
+                        <Text style={styles.code}>{data.away.code}</Text>
+                        <SvgUri
+                            onError={() =>
+                                console.log('error')
+                            }
+                            width="40"
+                            height="40"
+                            style={{ marginLeft: 10 }}
+                            uri={data.teamAwayFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
+                        />
                     </View>
                 </View>
                 <View>
@@ -60,10 +76,9 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                 </View>
             </View>
         </TouchableOpacity>
-
     );
 }
-const w: any = Dimensions.get('window').width
+const { width, height } = Dimensions.get('window')
 export type Props = NativeStackScreenProps<RootStackParamList, "MyMatches">;
 export default function MyMatches({ navigation, route }: Props) {
     const { userToken, user } = useSelector((state: any) => state.user);
@@ -116,7 +131,7 @@ export default function MyMatches({ navigation, route }: Props) {
     }, []);
     useEffect(() => {
         const i = setInterval(() => {
-            setDate(new Date());
+            //setDate(new Date());
         }, 1000);
         return () => {
             clearInterval(i);
@@ -170,20 +185,19 @@ export default function MyMatches({ navigation, route }: Props) {
                     renderScene={renderScene}
                     onIndexChange={(a) => setIndex(a)
                     }
-                    initialLayout={{ width: w }}
+                    initialLayout={{ width: width }}
                     overScrollMode={'auto'}
                     renderTabBar={props => (
                         <TabBar
                             {...props}
-                            tabStyle={{ width: w / 2, backgroundColor: '#5c5a5a' }}
+                            tabStyle={{ width: width / 2 }}
                             scrollEnabled={true}
                             renderTabBarItem={(props) => (
-                                <View>
+                                <View style={props.key == (index == 0 ? 'upcoming' : 'completed') ? styles.firstTab : styles.secondTab}>
                                     <TabBarItem
-
                                         {...props}
                                         activeColor='white'
-                                        inactiveColor='white'
+                                        inactiveColor='#212121'
                                     />
                                 </View>
                             )}
@@ -205,13 +219,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         color: 'white',
         padding: 10,
-        height: 600
+        height: 600,
+        paddingVertical:300
     },
     tabsContainer: {
         backgroundColor: 'white',
         color: 'white',
         zIndex: 0,
-        height: 600,
+        height: "86.66%",
         width: "100%"
     },
     match: {
@@ -255,6 +270,12 @@ const styles = StyleSheet.create({
         height: 50,
         resizeMode: 'stretch',
     },
+    firstTab: {
+        backgroundColor: '#212121'
+    },
+    secondTab: {
+        backgroundColor: '#FFFFFF'
+    },
     teamContainer: {
         flex: 1,
         backgroundColor: 'white',
@@ -283,9 +304,16 @@ const styles = StyleSheet.create({
     },
     dateText: {
         fontSize: 12,
-        color: 'rgb(94, 91, 91)'
+        color: 'rgb(130, 130, 130)'
     },
     title: {
         overflow: 'hidden',
+        fontSize: 14,
+        fontWeight: '200'
+    },
+    code: {
+        overflow: 'hidden',
+        fontSize: 14,
+        fontWeight: 'bold'
     }
 });
