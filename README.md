@@ -18,31 +18,6 @@ This project is a clone of DREAM 11 It has various features like
 ![Desktop screenshot (1)](https://github.com/rajeshmn47/dream-11-app/assets/24763499/75e9c36b-2f5e-4a7e-a5bf-5bf96c6fa9ab)
 ![Desktop screenshot (2)](https://github.com/rajeshmn47/dream-11-app/assets/24763499/c9c4245e-18b4-427f-bab4-b443971eb7b0)
 ![Desktop screenshot (3)](https://github.com/rajeshmn47/dream-11-app/assets/24763499/f49c5a07-41b8-486e-bd78-4daefccf2850)
-<p>
-<img src="https://github.com/rajeshmn47/dream-11-clone-mern-stack/assets/24763499/2a8a4ee1-3fc3-4105-b3b4-f3c02ce50f7f" width="328"  height="600"  style="margin-right: 90px"/>
- <span><img src="./aligner.png" height=50 width=150 /></span> 
-<img src="https://user-images.githubusercontent.com/24763499/231622101-c53fa343-ddcd-4485-8e46-3ca6b1032f8d.png" width="328"   height="600"  style="margin-right: 30px"/>
-</p>
-
-<p>
-<img src="https://user-images.githubusercontent.com/24763499/231621706-ea780be6-bc6f-4dc6-9dd8-577d7c49f9c7.png" width="328"   height="600" style="margin-right: 90px"/>
- <span><img src="./aligner.png" height=50 width=150 /></span> 
-<img src="https://user-images.githubusercontent.com/24763499/212312487-4f49ee29-d0ec-422b-9dc2-8bb918dc6614.png" width="328"  height="500"/>
-</p>
-
-<p>
-<img src="https://user-images.githubusercontent.com/24763499/231621529-85eda44e-cdf7-428d-a565-741ce34d9425.png" width="328"   height="500"/>
- <span><img src="./aligner.png" height=50 width=150 /></span> 
-<img src="https://user-images.githubusercontent.com/24763499/212457726-7fe157ba-01b6-4669-acca-8413c2194cc0.png" width="328"   height="500"/>
-</p>
-
-<p>
-<img src="https://user-images.githubusercontent.com/24763499/212457733-cd239d1a-fd45-4189-aac4-bc8d28e73a62.png"  width="328"  height="500"/>
- <span><img src="./aligner.png" height=50 width=150 /></span> 
-<img src="https://user-images.githubusercontent.com/24763499/210806922-a0b21cdc-c444-4e27-ab84-e1e7ebbfc3ca.png"  width="328"  height="500"/>
-</p>
-
-<img src="https://user-images.githubusercontent.com/24763499/210806961-5d84176a-8738-46f4-ae70-f80d771f6401.png"  width="328"  height="500"/>
 </>
 
 # Getting Started with Create React App
