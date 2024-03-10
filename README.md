@@ -40,8 +40,7 @@ This project is a clone of DREAM 11 It has various features like
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
+![Desktop screenshot (7)](https://github.com/rajeshmn47/dream-11-app/assets/24763499/d03fde0b-c16f-4687-966a-51f758b66d72)
 
 In the project directory, you can run:
 
