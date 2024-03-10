@@ -1,3 +1,5 @@
+![Desktop screenshot (9)](https://github.com/rajeshmn47/dream-11-app/assets/24763499/8e769117-1d09-479a-9fc5-a3bf49ffd2ae)
+![Desktop screenshot (8)](https://github.com/rajeshmn47/dream-11-app/assets/24763499/812c62c2-0313-40ce-9256-5adffe2e01b7)
 This project is a clone of DREAM 11 It has various features like
 <p>1)phone or email otp authentication</p>
 <p>2)forgot password</p>
