@@ -1,9 +1,6 @@
-import { Image, StyleSheet, Text, TouchableHighlight, View } from "react-native";
-import Icon from 'react-native-vector-icons/SimpleLineIcons';
-import { checkar, checkwk, getPlayerName } from "../../utils/playersFilter";
-import { getImageName } from "../../utils/images";
+import { Text, TouchableHighlight, View } from "react-native";
 import { Slider } from '@miblanchard/react-native-slider';
-import { AntDesign, Entypo } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import { styles } from "./stylesheet";
 import { useSelector } from "react-redux";
 

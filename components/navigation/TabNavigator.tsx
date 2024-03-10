@@ -1,10 +1,8 @@
 
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
 import MyStackNavigator from "./MyStackNavigator";
 import MainStackNavigator from "./MainStackNavigator";
-import HomeScreen from "../HomeScreen";
 import Icon from "react-native-vector-icons/AntDesign";
 import MaterialIcon from "react-native-vector-icons/Octicons";
 import SimpleIcon from "react-native-vector-icons/SimpleLineIcons";

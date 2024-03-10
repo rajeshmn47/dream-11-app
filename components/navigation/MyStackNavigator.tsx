@@ -38,6 +38,7 @@ import Help from '../sidebar/Help';
 import EditTeam from '../EditTeam';
 import Withdraw from '../Withdraw';
 import UserBankAccount from '../UserBankAccount';
+import UserProfile from '../UserProfile';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -77,6 +78,7 @@ export default function MyStackNavigator() {
                         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="MyMatches" component={MyMatches} options={{ headerShown: false }} />
                         <Stack.Screen name="Detail" component={DetailsScreen} options={{ headerShown: false }} />
+                        <Stack.Screen name="UserProfile" component={UserProfile} />
                         <Stack.Screen name="Create" component={CreateTeam} />
                         <Stack.Screen name="Edit" component={EditTeam} />
                         <Stack.Screen name="Captain" component={SelectCaptain} />

@@ -136,14 +136,12 @@ export default function DetailsScreen({ navigation, route }: Props) {
     const renderCommentaryItem: ListRenderItem<Commentary> = ({ item }) => <CommentaryItem data={item} match={match_details} />;
     useEffect(() => {
         async function getMatch() {
-            setLoading(true)
+            setRefreshing(true)
             dispatch<any>(getmatch(route.params.matchId));
             const data = await API.get(`${URL}/getcontests/${route.params.matchId}`);
             setContests(data.data.contests);
-            const joinedC = await API.get(
-                `${URL}/getjoinedcontest/${route.params.matchId}`
-            );
-            setLoading(false);
+            const joinedC = await API.get(`${URL}/getjoinedcontest/${route.params.matchId}`);
+            setRefreshing(false);
             setMyContests([...joinedC.data.contests]);
         }
         getMatch();
@@ -221,6 +219,12 @@ export default function DetailsScreen({ navigation, route }: Props) {
                         data={contests}
                         renderItem={renderItem}
                         keyExtractor={(item: any) => item._id}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing ? true : false}
+                                onRefresh={refreshHandler}
+                            />
+                        }
                     />
                 </View>
             </View>

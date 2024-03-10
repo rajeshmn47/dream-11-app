@@ -3,7 +3,7 @@ import { Button, Dimensions, ScrollView, StyleSheet, TouchableHighlight } from '
 import { Text, FlatList, TextInput, View, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from './HomeScreen';
+import { RootStackParamList } from './../App';
 import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import axios from 'axios';

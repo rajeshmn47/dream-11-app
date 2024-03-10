@@ -21,12 +21,32 @@ export function getPlayerName(players: any, id: any) {
   let player: any = {}
   player = players?.find((p: any) => p?.playerId == id)
   let name: any = player?.playerName?.split(" ");
-  if(name){
-  let a: any = name[0]?.charAt(0);
-  let b: any = name[1];
-  return a + " " + b;
+  if (name) {
+    let a: any = name[0]?.charAt(0);
+    let b: any = name[1];
+    return a + " " + b;
   }
-  else{
+  else {
+    return "ab"
+  }
+}
+
+export function getShrtName(name: string) {
+  if (name) {
+    let names=name.split(" ")
+    if(names?.length>1){
+    let a: any = names[0]?.charAt(0);
+    let b: any = names[1];
+    return a + " " + b;
+    }
+    else if(names?.length==1){
+      return names[0];
+    }
+    else{
+      return names[0]+names[1]+names[2];
+    }
+  }
+  else {
     return "ab"
   }
 }

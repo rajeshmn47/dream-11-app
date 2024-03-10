@@ -34,7 +34,7 @@ import {
 import db from "../firebase/config";
 import Overview from './topbar/Overview';
 import { URL } from '../constants/userConstants';
-import { checkar, checkwk } from '../utils/playersFilter';
+import { checkar, checkwk, getPlayerName, getShrtName } from '../utils/playersFilter';
 import { API } from '../actions/userAction';
 import Loader from './loader/Loader';
 
@@ -278,11 +278,15 @@ export default function CreateTeam({ navigation, route }: Props) {
       onPress={!data.isSelected ? () => handleClick(data._id) : () => handleRemove(data._id)}>
       <View style={data.isSelected ? styles.pSelected : styles.notSelected}>
         <View style={!data.isSelected ? styles.teamContainer : styles.selected}>
-          <View style={{ backgroundColor: "transparent" }}>
-            <Image source={{ uri: getImgurl(data.image, data.playerName) }} style={{ width: 35, height: 35 }} />
+          <View style={{ backgroundColor: "transparent", position: "relative" }}>
+            <Image source={{ uri: getImgurl(data.image, data.playerName) }} style={{ width: 90, height: 90 }} />
+            {match_details?.teamHomePlayers.find((pl: any) => pl.playerId == data.playerId) ?
+              <View style={styles.whiteBg}><Text style={styles.black}>{match_details?.teamHomeCode}</Text></View>
+              : <View style={styles.blackBg}><Text style={styles.bright}>{match_details?.teamAwayCode}</Text></View>
+            }
           </View>
           <View style={styles.team}>
-            <Text>{data.playerName}</Text>
+            <Text style={{ textTransform: "capitalize" }}>{getShrtName(data.playerName)}</Text>
           </View>
           <View style={styles.team}>
             <Text>9.0</Text>
@@ -316,7 +320,7 @@ export default function CreateTeam({ navigation, route }: Props) {
           <Text style={styles.bright} >
             {
               match?.teamHomePlayers.filter((f: any) =>
-              players?.filter((k) => k.isSelected === true)?.some((s: any) => f.playerId == s.playerId)
+                players?.filter((k) => k.isSelected === true)?.some((s: any) => f.playerId == s.playerId)
               ).length
             }
           </Text>
@@ -328,14 +332,14 @@ export default function CreateTeam({ navigation, route }: Props) {
           <Text style={styles.bright} >
             {
               match?.teamAwayPlayers.filter((f: any) =>
-              players?.filter((k) => k.isSelected === true)?.some((s: any) => f.playerId == s.playerId)
+                players?.filter((k) => k.isSelected === true)?.some((s: any) => f.playerId == s.playerId)
               ).length
             }
           </Text>
         </View>
         <View style={styles.info}>
-          <Text  style={styles.bright}>Credits Left</Text>
-          <Text  style={styles.bright}>100</Text>
+          <Text style={styles.bright}>Credits Left</Text>
+          <Text style={styles.bright}>100</Text>
         </View>
       </View>
       <View style={styles.boxes}>
@@ -429,7 +433,7 @@ const styles = StyleSheet.create({
     padding: 5
   },
   pSelected: {
-    height: 80,
+    height: 90,
     borderBottomColor: "#ccc",
     borderBottomWidth: 1,
     backgroundColor: '#8abb9d'
@@ -465,7 +469,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     color: 'white',
     flexDirection: 'row',
-    height: 70,
+    height: 90,
     padding: 0,
     borderRadius: 2,
     width: '100%',
@@ -479,7 +483,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     color: 'white',
     flexDirection: 'row',
-    height: 70,
+    height: 90,
     borderRadius: 2,
     width: '100%'
   },
@@ -505,7 +509,10 @@ const styles = StyleSheet.create({
     height: 10,
     padding: 2,
     borderRadius: 2,
-    zIndex: 0
+    zIndex: 0,
+    position: "absolute",
+    bottom: 100,
+    width:"100%"
   },
   next: {
     backgroundColor: 'green',
@@ -533,7 +540,7 @@ const styles = StyleSheet.create({
   notSelected: {
     padding: 0,
     borderRadius: 10,
-    height: 80
+    height: 90
   },
   disabled: {
     backgroundColor: 'grey',
@@ -613,8 +620,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10
   },
-  info:{
-    justifyContent:"center",
-    alignItems:"center"
+  info: {
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  blackBg: {
+    backgroundColor: "#212121",
+    borderRadius: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 3
+  },
+  whiteBg: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 4
+  },
+  black: {
+    color: "#212121",
+    textTransform: "capitalize"
   }
 });

@@ -1,12 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
 import { Dimensions, RefreshControl, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Text, FlatList, TextInput, View, Image, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ListRenderItem } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import FastImage from 'react-native-fast-image';
-import axios from "axios";
-import { getDisplayDate, hoursRemaining, isTommorrow, sameDayorNot } from '../utils/dateFormat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { API, loadToken, logout } from '../actions/userAction';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,19 +10,6 @@ import BottomBar from './BottomBar';
 import Mega from "./homescreen/Mega";
 import { SceneMap, TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 import { SvgUri } from 'react-native-svg';
-import {
-    Title,
-    Paragraph,
-    Button,
-} from 'react-native-paper';
-import {
-    Tabs,
-    TabScreen,
-    TabsProvider,
-    useTabIndex,
-    useTabNavigation,
-} from 'react-native-paper-tabs';
-import { TabItemProps } from '@rneui/themed';
 import { URL } from '../constants/userConstants';
 import Loader from './loader/Loader';
 import { Timer } from './Timer';
@@ -69,7 +51,7 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                             }
                             width="40"
                             height="40"
-                            style={{ marginRight: 10 }}
+                            
                             uri={data.teamHomeFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
                         />
                         </View>
@@ -84,8 +66,7 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                                 console.log('error')
                             }
                             width="40"
-                            height="40"
-                            style={{ marginLeft: 10 }}
+                            height="40"                         
                             uri={data.teamAwayFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
                            />
                         

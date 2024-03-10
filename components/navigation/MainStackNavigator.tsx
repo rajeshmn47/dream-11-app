@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import DetailsScreen from '../DetailsScreen';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from '../../App';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';

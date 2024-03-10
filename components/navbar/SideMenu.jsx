@@ -99,11 +99,13 @@ class SideMenu extends React.Component {
         return (
             <SafeAreaView style={styles.safeAreaView}>
                 <View style={styles.container}>
-                    <View style={styles.titleContainer}>
-                        <IonicIcon name="account-circle" style={styles.icon} size={25} color='#FFFFFF' />
-                        <Text style={styles.textColor}>{user?.username}</Text>
-                        <Icon name="arrow-right" style={styles.arrowicon} size={20} color='#FFF' />
-                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate("UserProfile")}>
+                        <View style={styles.titleContainer}>
+                            <IonicIcon name="account-circle" style={styles.icon} size={25} color='#FFFFFF' />
+                            <Text style={styles.textColor}>{user?.username}</Text>
+                            <Icon name="arrow-right" style={styles.arrowicon} size={20} color='#FFF' />
+                        </View>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Balance")}>
                         <View style={styles.sidebarItem}>
                             <Icon name="wallet" style={styles.icon} size={20} />

@@ -1,7 +1,5 @@
 import React from "react";
-
 import { createDrawerNavigator } from "@react-navigation/drawer";
-
 import HomeStackNavigator from "./MainStackNavigator";
 import MyStackNavigator from "./MyStackNavigator";
 import TabNavigator from "./TabNavigator";

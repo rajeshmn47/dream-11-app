@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OtpInput } from "react-native-otp-entry";
 import Loader from '../loader/Loader';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from '../../App';
 import { URL } from '../../constants/userConstants';
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Register">;

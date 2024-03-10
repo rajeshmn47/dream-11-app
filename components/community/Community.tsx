@@ -2,7 +2,7 @@ import React, { createRef, useState } from 'react';
 import { View, Button, TextInput, StyleSheet, Keyboard, Dimensions, Text } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 import { RAZORPAY_KEY } from '../../constants/matchConstants';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from '../../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { URL } from '../../constants/userConstants';
 import { useSelector } from 'react-redux';
