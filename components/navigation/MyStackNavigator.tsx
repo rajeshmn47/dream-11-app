@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import DetailsScreen from '../DetailsScreen';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from '../../App';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../../store';
@@ -27,6 +27,17 @@ import SelectCaptain from '../Captain';
 import ContestDetail from '../ContestDetail';
 import MyMatches from '../MyMatches';
 import EntryScreen from '../entry/Entry';
+import Payment from '../Payment';
+import Balance from "../Balance";
+import Winners from '../winners/Winners';
+import Community from "../community/Community"
+import Settings from '../sidebar/Settings';
+import HowToPlay from '../sidebar/HowToPlay';
+import TermsandConditions from '../sidebar/TermsandConditions';
+import Help from '../sidebar/Help';
+import EditTeam from '../EditTeam';
+import Withdraw from '../Withdraw';
+import UserBankAccount from '../UserBankAccount';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -41,32 +52,6 @@ export interface Match {
     date: any;
 }
 
-
-const Item = ({ data, date }: { data: Match, date: any }) => (
-    <View style={styles.match}>
-        <View>
-            <Text>{data.match_title}</Text>
-        </View>
-        <View style={styles.teamContainer}>
-            <View style={styles.team}>
-                <Image source={{ uri: data.teamHomeFlagUrl }} style={{ width: 40, height: 40 }} />
-                <Text>{data.home.code}</Text>
-            </View>
-            <View style={styles.team}>
-                <Text>{getDisplayDate(data.date, 'i', date)}</Text>
-            </View>
-            <View style={styles.team}>
-                <Text>{data.away.code}</Text>
-                <Image source={{ uri: data.teamAwayFlagUrl }} style={{ width: 40, height: 40 }} />
-            </View>
-        </View>
-        <View>
-            <Text>{data.match_title}</Text>
-        </View>
-    </View>
-);
-
-
 export default function MyStackNavigator() {
     const dispatch = useDispatch();
     const { userToken, user } = useSelector((state: any) => state.user);
@@ -79,7 +64,7 @@ export default function MyStackNavigator() {
                 // No token found, user isn't signed in
                 <NavigationContainer independent={true}>
                     <Stack.Navigator>
-                        <Stack.Screen name="Entry" component={EntryScreen} options={{ headerShown: false }}/>
+                        <Stack.Screen name="Entry" component={EntryScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="Login" component={LoginScreen} />
                         <Stack.Screen name="Register" component={RegisterScreen} />
                         <Stack.Screen name="Home" component={HomeScreen} />
@@ -91,10 +76,21 @@ export default function MyStackNavigator() {
                     <Stack.Navigator>
                         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="MyMatches" component={MyMatches} options={{ headerShown: false }} />
-                        <Stack.Screen name="Detail" component={DetailsScreen} options={{ headerShown: false }}/>
+                        <Stack.Screen name="Detail" component={DetailsScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="Create" component={CreateTeam} />
+                        <Stack.Screen name="Edit" component={EditTeam} />
                         <Stack.Screen name="Captain" component={SelectCaptain} />
                         <Stack.Screen name="ConDetail" component={ContestDetail} />
+                        <Stack.Screen name="Payment" component={Payment} />
+                        <Stack.Screen name="Balance" component={Balance} />
+                        <Stack.Screen name="Bank" component={UserBankAccount} />
+                        <Stack.Screen name="Withdraw" component={Withdraw} />
+                        <Stack.Screen name="Winners" component={Winners} options={{ headerShown: false }} />
+                        <Stack.Screen name="Community" component={Community} options={{ headerShown: false }} />
+                        <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+                        <Stack.Screen name="HowToPlay" component={HowToPlay} options={{ headerShown: false }} />
+                        <Stack.Screen name="TermsandConditions" component={TermsandConditions} options={{ headerShown: false }} />
+                        <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </NavigationContainer>
             )}

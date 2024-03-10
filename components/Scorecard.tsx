@@ -1,12 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, StyleSheet, TouchableHighlight, useWindowDimensions } from 'react-native';
+import { Button, RefreshControl, ScrollView, StyleSheet, TouchableHighlight, useWindowDimensions } from 'react-native';
 import { Text, FlatList, TextInput, View, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from './HomeScreen';
+import { RootStackParamList } from './../App';
 import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import Icon from 'react-native-vector-icons/AntDesign';
+import { useDispatch } from 'react-redux';
+import { getmatch } from '../actions/matchAction';
 
 export interface Contest {
     _id: string;
@@ -20,119 +22,156 @@ export interface Contest {
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Captain">;
 export default function Scorecard({ data, livescore, g }: { data: any, g: any, livescore: any }) {
+    const dispatch = useDispatch();
+    const [refreshing, setRefreshing] = useState<Boolean>(false);
     const width = useWindowDimensions().width
     const [tableHead, setTableHead] = useState<any[]>(['batter', 'r', 'b', '4s', '6s', 's/r']);
-    const [tableTitle, setTableTitle] = useState(['playerName', 'points', 'c']);
     const [widthArr, setWidthArr] = useState<any[]>([width * 2 / 7, width / 7, width / 7, width / 7, width / 7, width / 7]);
     const [homePlayers, setHomePlayers] = useState<any[]>([]);
-    const [awayPlayers, setAwayPlayers] = useState<any[]>([])
-    const [tableData, setTableData] = useState([
-        ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
-        ['a', 'b', 'c', '1', '2', '3', '1', '2', '3'],
-        ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
-        ['a', 'b', 'c', '1', '2', '3', '1', '2', '3']
-    ])
+    const [awayPlayers, setAwayPlayers] = useState<any[]>([]);
     useEffect(() => {
-        const all: any[] = [];
-        const allAway: any[] = [];
         if (data?.teamHomePlayers.length > 0) {
-            data.teamHomePlayers.forEach((t: any) => {
-                all.push([t.playerName, t.runs, t.balls, t.fours, t.sixes, t.strikeRate]);
-            });
+            setHomePlayers(data?.teamHomePlayers)
         }
         if (data?.teamAwayPlayers.length > 0) {
-            data.teamAwayPlayers.forEach((t: any) => {
-                allAway.push([t.playerName, t.runs, t.balls, t.fours, t.sixes, t.strikeRate]);
-            });
+            setAwayPlayers(data?.teamAwayPlayers)
         }
-        setHomePlayers([...all])
-        setAwayPlayers([...allAway]);
     }, [data]);
+    const refreshHandler = () => {
+        setRefreshing(true);
+        dispatch<any>(getmatch(data?.matchId));
+        setRefreshing(false);
+    }
     return (
-        <View style={styles.container}>
-            <Collapse style={styles.collapse}>
-                <CollapseHeader>
-                    {data?.isHomeFirst ? <View style={styles.headerContainer}>
-                        <Text style={styles.title}>{data?.titleFI}</Text>
-                        <View style={styles.downScore}>
-                            <Text>({data?.oversFI}overs) {data?.runFI}/{data?.wicketsFI}</Text>
-                            <Icon name="down" />
-                        </View>
-                    </View>
-                        :
-                        <View style={styles.headerContainer}>
-                            <Text style={styles.title}>{data?.titleSI}</Text>
+        <ScrollView refreshControl={
+            <RefreshControl
+                refreshing={refreshing ? true : false}
+                onRefresh={refreshHandler}
+            />
+        }>
+            {data?.teamHomePlayers?.length ? <View style={styles.container}>
+                <Collapse style={styles.collapse}>
+                    <CollapseHeader>
+                        {data?.isHomeFirst ? <View style={styles.headerContainer}>
+                            <Text style={styles.title}>{data?.titleFI}</Text>
                             <View style={styles.downScore}>
-                                <Text>
-                                    ({data?.oversSI}overs) {data?.runSI / data?.wicketsSI}
-                                </Text>
+                                <Text>({data?.oversFI}overs) {data?.runFI}/{data?.wicketsFI}</Text>
                                 <Icon name="down" />
                             </View>
-                        </View>}
-                </CollapseHeader>
-                <CollapseBody>
-                    <Table borderStyle={{ borderWidth: 1 }}>
-                        <Row data={tableHead} flexArr={[1.1, 0.5, 0.5, 0.5, 0.5, 0.5]} style={styles.head} textStyle={styles.text} />
-                    </Table>
-                    <ScrollView style={styles.dataWrapper}>
-                        <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-                            {
-                                homePlayers.map((rowData, index) => (
-                                    <Row
-                                        key={index}
-                                        data={rowData}
-                                        widthArr={widthArr}
-                                        style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
-                                        textStyle={styles.text}
-                                    />
-                                ))
-                            }
-                        </Table>
-                    </ScrollView>
-                </CollapseBody>
-            </Collapse>
-            <Collapse>
-                <CollapseHeader>
-                    {!data?.isHomeFirst ? <View style={styles.headerContainer}>
-                        <Text style={styles.title}>{data?.titleFI}</Text>
-                        <View style={styles.downScore}>
-                            <Text>({data?.oversFI}overs) {data?.runFI}/{data?.wicketsFI}</Text>
-                            <Icon name="down" />
                         </View>
-                    </View>
-                        :
-                        <View style={styles.headerContainer}>
-                            <Text style={styles.title}>{data?.titleSI}</Text>
+                            :
+                            <View style={styles.headerContainer}>
+                                <Text style={styles.title}>{data?.titleSI}</Text>
+                                <View style={styles.downScore}>
+                                    <Text>
+                                        ({data?.oversSI}overs) {data?.runSI}/{data?.wicketsSI}
+                                    </Text>
+                                    <Icon name="down" />
+                                </View>
+                            </View>}
+                    </CollapseHeader>
+                    <CollapseBody>
+                        <Table borderStyle={{ borderWidth: 1 }}>
+                            <Row data={tableHead} flexArr={[1, 0.5, 0.5, 0.5, 0.5, 0.5]} style={styles.head} textStyle={styles.headerText} />
+                        </Table>
+                        <ScrollView style={styles.dataWrapper}>
+                            <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                                {
+                                    homePlayers.map((r, index) => (
+                                        <Row
+                                            key={index}
+                                            data={[r.playerName, r.runs, r.balls, r.fours, r.sixes, Math.floor(r.strikeRate)]}
+                                            widthArr={widthArr}
+                                            style={styles.row}
+                                            textStyle={styles.text}
+                                        />
+                                    ))
+                                }
+                            </Table>
+                        </ScrollView>
+                        <Table borderStyle={{ borderWidth: 1 }}>
+                            <Row data={['bowler', 'o', 'm', 'r', 'w', 'e']} flexArr={[1, 0.5, 0.5, 0.5, 0.5, 0.5]} style={styles.head} textStyle={styles.headerText} />
+                        </Table>
+                        <ScrollView style={styles.dataWrapper}>
+                            <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                                {
+                                    awayPlayers.filter((a) => a.overs > 0).map((r, index) => (
+                                        <Row
+                                            key={index}
+                                            data={[r.playerName, r.overs, r.maidens, r.runsConceded, r.wickets, Math.floor(r.economy * 10)]}
+                                            widthArr={widthArr}
+                                            style={styles.row}
+                                            textStyle={styles.text}
+                                        />
+                                    ))
+                                }
+                            </Table>
+                        </ScrollView>
+                    </CollapseBody>
+                </Collapse>
+                <Collapse>
+                    <CollapseHeader>
+                        {!data?.isHomeFirst ? <View style={styles.headerContainer}>
+                            <Text style={styles.title}>{data?.titleFI}</Text>
                             <View style={styles.downScore}>
-                                <Text>
-                                    ({data?.oversSI}overs) {data?.runSI / data?.wicketsSI}
-                                </Text>
+                                <Text>({data?.oversFI}overs) {data?.runFI}/{data?.wicketsFI}</Text>
                                 <Icon name="down" />
                             </View>
-                        </View>}
-                </CollapseHeader>
-                <CollapseBody>
-                    <Table borderStyle={{ borderWidth: 1 }}>
-                        <Row data={tableHead} flexArr={[1, 0.5, 0.5, 0.5, 0.5, 0.5]} style={styles.head} textStyle={styles.text} />
-                    </Table>
-                    <ScrollView style={styles.dataWrapper}>
-                        <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-                            {
-                                awayPlayers.map((rowData, index) => (
-                                    <Row
-                                        key={index}
-                                        data={rowData}
-                                        widthArr={widthArr}
-                                        style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
-                                        textStyle={styles.text}
-                                    />
-                                ))
-                            }
+                        </View>
+                            :
+                            <View style={styles.headerContainer}>
+                                <Text style={styles.title}>{data?.titleSI}</Text>
+                                <View style={styles.downScore}>
+                                    <Text>
+                                        ({data?.oversSI}overs) {data?.runSI} / {data?.wicketsSI}
+                                    </Text>
+                                    <Icon name="down" />
+                                </View>
+                            </View>}
+                    </CollapseHeader>
+                    <CollapseBody>
+                        <Table borderStyle={{ borderWidth: 1 }}>
+                            <Row data={tableHead} flexArr={[1, 0.5, 0.5, 0.5, 0.5, 0.5]} style={styles.head} textStyle={styles.headerText} />
                         </Table>
-                    </ScrollView>
-                </CollapseBody>
-            </Collapse>
-        </View>
+                        <ScrollView style={styles.dataWrapper}>
+                            <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                                {
+                                    awayPlayers.map((r, index) => (
+                                        <Row
+                                            key={index}
+                                            data={[r.playerName, r.runs, r.balls, r.fours, r.sixes, Math.floor(r.strikeRate)]}
+                                            widthArr={widthArr}
+                                            style={styles.row}
+                                            textStyle={styles.text}
+                                        />
+                                    ))
+                                }
+                            </Table>
+                        </ScrollView>
+                        <Table borderStyle={{ borderWidth: 1 }}>
+                            <Row data={['bowler', 'o', 'm', 'r', 'w', 'e']} flexArr={[1, 0.5, 0.5, 0.5, 0.5, 0.5]} style={styles.head} textStyle={styles.headerText} />
+                        </Table>
+                        <ScrollView style={styles.dataWrapper}>
+                            <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                                {
+                                    homePlayers.filter((a) => a.overs > 0).map((r, index) => (
+                                        <Row
+                                            key={index}
+                                            data={[r.playerName, r.overs, r.maidens, r.runsConceded, r.wickets, Math.floor(r.economy * 10)]}
+                                            widthArr={widthArr}
+                                            style={styles.row}
+                                            textStyle={styles.text}
+                                        />
+                                    ))
+                                }
+                            </Table>
+                        </ScrollView>
+                    </CollapseBody>
+                </Collapse>
+            </View> : <Text style={{ textTransform: "capitalize", marginTop: 10, textAlign: "center", color: "#8d0606" }}>
+                match not begun yet
+            </Text>}
+        </ScrollView>
     );
 }
 
@@ -324,11 +363,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginRight: 5
     },
-    head: { height: 40, backgroundColor: '#f1f8ff' },
+    head: { height: 40, backgroundColor: '#202020' },
     header: { height: 50, backgroundColor: '#537791' },
-    text: { textAlign: 'center', fontWeight: '100' },
+    text: { textAlign: 'center', fontWeight: '200' },
+    headerText: { textAlign: 'center', fontWeight: '400', color: "#FFF", textTransform: "capitalize" },
     dataWrapper: { marginTop: -1 },
-    row: { height: 40, backgroundColor: '#E7E6E1' },
+    row: { height: 40, backgroundColor: '#ffffff' },
     headerContainer: {
         backgroundColor: 'rgb(254, 244, 222)',
         height: 50,
@@ -348,6 +388,7 @@ const styles = StyleSheet.create({
     },
     collapse: {
         borderBottomColor: '#d89595',
-        borderBottomWidth: 1
+        borderBottomWidth: 1,
+        height: "auto"
     }
 });

@@ -88,7 +88,7 @@ export default function MainStackNavigator() {
     }, []);
     useEffect(() => {
         const i = setInterval(() => {
-            setDate(new Date());
+            //setDate(new Date());
         }, 1000);
         return () => {
             clearInterval(i);

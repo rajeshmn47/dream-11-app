@@ -58,10 +58,12 @@ function geturl() {
   const current = process.env.REACT_APP_API;
   if (current == "local") {
     //return "http://192.168.202.175:8000";
-    return "https://backendforpuand-dream11.onrender.com";
+    //return "https://backendforpuand-dream11.onrender.com";
+    return "https://apk.thepowerplay.co";
   }
-  return "https://backendforpuand-dream11.onrender.com";
+  //return "https://backendforpuand-dream11.onrender.com";
   //return "http://192.168.202.175:8000";
+  return "https://apk.thepowerplay.co";
 }
 
 function getfrontendurl() {

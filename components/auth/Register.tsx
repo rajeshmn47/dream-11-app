@@ -16,20 +16,16 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { getAuth, signInWithPhoneNumber } from "firebase/auth";
 import { OtpInput } from "react-native-otp-entry";
-import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import Loader from '../loader/Loader';
 import { RootStackParamList } from '../HomeScreen';
 import { URL } from '../../constants/userConstants';
-import { firebaseConfig } from '../../firebase/config';
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Register">;
 
 const RegisterScreen = ({ navigation }: Props) => {
     const recaptchaVerifier: any = React.useRef(null);
     const appVerifier = recaptchaVerifier.current;
-    const auth = getAuth();
     const [phoneNumber, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
     const [otpScreen, setOtpScreen]: any = useState(false);
@@ -55,8 +51,7 @@ const RegisterScreen = ({ navigation }: Props) => {
         setLoading(true);
         let dataToSend: any = { phoneNumber: phoneNumber };
         let formBody: any = [];
-        console.log(dataToSend, 'formbody')
-        fetch(`http://192.168.202.175:9000/auth/phoneLogin`, {
+        fetch(`${URL}/auth/phoneLogin`, {
             method: 'POST',
             body: JSON.stringify(dataToSend),
             headers: {
@@ -68,7 +63,6 @@ const RegisterScreen = ({ navigation }: Props) => {
             .then((responseJson) => {
                 //Hide Loader
                 setLoading(false);
-                console.log(responseJson);
                 // If server response message same as Data Matched
                 if (responseJson.success === 'ok') {
                     setOtpScreen(true)
@@ -95,7 +89,7 @@ const RegisterScreen = ({ navigation }: Props) => {
         else {
             setLoading(true);
             let dataToSend: any = { otp: otp, phoneNumber: phoneNumber };
-            fetch(`http://192.168.202.175:9000/auth/verifyPhoneOtp`, {
+            fetch(`${URL}/auth/verifyPhoneOtp`, {
                 method: 'POST',
                 body: JSON.stringify(dataToSend),
                 headers: {
@@ -128,8 +122,8 @@ const RegisterScreen = ({ navigation }: Props) => {
             <Loader loading={loading} />
             <ScrollView
                 keyboardShouldPersistTaps="handled"
+                keyboardDismissMode={'on-drag'}
                 contentContainerStyle={{
-                    flex: 1,
                     justifyContent: 'center',
                     alignContent: 'center',
                 }}>
@@ -189,7 +183,7 @@ const RegisterScreen = ({ navigation }: Props) => {
                             <Text
                                 style={styles.registerTextStyle}
                                 onPress={() => navigation.navigate('Login')}>
-                            Already have account? Login
+                                Already have account? Login
                             </Text>
                         </KeyboardAvoidingView>
                     }
@@ -202,10 +196,8 @@ export default RegisterScreen;
 
 const styles = StyleSheet.create({
     mainBody: {
-        flex: 1,
         justifyContent: 'center',
-        backgroundColor: '#ffffff',
-        alignContent: 'center',
+        alignContent: 'center'
     },
     SectionStyle: {
         flexDirection: 'row',

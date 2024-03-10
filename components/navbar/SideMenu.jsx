@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, Text, View, Switch, TouchableOpacity } from "react-native";
+import { SafeAreaView, Text, View, Switch, TouchableOpacity, DevSettings } from "react-native";
 import { StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/SimpleLineIcons";
 import MaterialIcon from "react-native-vector-icons/Feather";
@@ -39,8 +39,10 @@ const styles = StyleSheet.create({
         fontSize: 18
     },
     text: {
-        fontSize: 16,
-        fontStyle: 'normal'
+        fontSize: 18,
+        fontStyle: 'normal',
+        textTransform: "capitalize",
+        color: "#000"
     },
     swithBlock: {
         flexDirection: "row",
@@ -73,8 +75,8 @@ const styles = StyleSheet.create({
     icon: {
         marginRight: 15
     },
-    arrowicon:{
-        marginLeft:100
+    arrowicon: {
+        marginLeft: 100
     }
 });
 
@@ -89,41 +91,55 @@ class SideMenu extends React.Component {
         const { dispatch } = this.props;
         dispatch(logout())
         dispatch(loadToken())
+        //DevSettings.reload()
     }
 
     render() {
+        const { navigation, user } = this.props;
         return (
             <SafeAreaView style={styles.safeAreaView}>
                 <View style={styles.container}>
                     <View style={styles.titleContainer}>
                         <IonicIcon name="account-circle" style={styles.icon} size={25} color='#FFFFFF' />
-                        <Text style={styles.textColor}>Rajesh</Text>
+                        <Text style={styles.textColor}>{user?.username}</Text>
                         <Icon name="arrow-right" style={styles.arrowicon} size={20} color='#FFF' />
                     </View>
-                    <View style={styles.sidebarItem}>
-                        <Icon name="wallet" style={styles.icon} size={20} />
-                        <Text style={styles.text}>Wallet Balance</Text>
-                    </View>
-                    <View style={styles.sidebarItem}>
-                        <Icon name="people" style={styles.icon} size={20} />
-                        <Text style={styles.text}>Community</Text>
-                    </View>
-                    <View style={styles.sidebarItem}>
-                        <Icon name="settings" style={styles.icon} size={20} />
-                        <Text style={styles.text}>settings</Text>
-                    </View>
-                    <View style={styles.sidebarItem}>
-                        <Icon name="game-controller" style={styles.icon} size={20} />
-                        <Text style={styles.text}>How to play</Text>
-                    </View>
-                    <View style={styles.sidebarItem}>
-                        <IonicIcon name="account-group-outline" style={styles.icon} size={20} />
-                        <Text style={styles.text}>terms & conditions</Text>
-                    </View>
-                    <View style={styles.sidebarItem}>
-                        <IonicIcon name="help" style={styles.icon} size={20} />
-                        <Text style={styles.text}>Help & Support</Text>
-                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate("Balance")}>
+                        <View style={styles.sidebarItem}>
+                            <Icon name="wallet" style={styles.icon} size={20} />
+                            <Text style={styles.text}>Wallet Balance</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Community")}>
+                        <View style={styles.sidebarItem}>
+                            <Icon name="people" style={styles.icon} size={20} />
+                            <Text style={styles.text}>Community</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
+                        <View style={styles.sidebarItem}>
+                            <Icon name="settings" style={styles.icon} size={20} />
+                            <Text style={styles.text}>settings</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("HowToPlay")}>
+                        <View style={styles.sidebarItem}>
+                            <Icon name="game-controller" style={styles.icon} size={20} />
+                            <Text style={styles.text}>How to play</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("TermsandConditions")}>
+                        <View style={styles.sidebarItem}>
+                            <IonicIcon name="account-group-outline" style={styles.icon} size={20} />
+                            <Text style={styles.text}>terms & conditions</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Help")}>
+                        <View style={styles.sidebarItem}>
+                            <IonicIcon name="help" style={styles.icon} size={20} />
+                            <Text style={styles.text}>Help & Support</Text>
+                        </View>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => this.onPress()}>
                         <View style={styles.sidebarItem}>
                             <IonicIcon name="logout" style={styles.icon} size={20} />

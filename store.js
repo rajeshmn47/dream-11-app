@@ -5,7 +5,7 @@ import {matchReducer} from './reducers/matchReducer';
 import { userReducer } from './reducers/userReducer';
 import { persistStore, persistReducer } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import { combineReducers } from 'redux';
 let reducers = combineReducers({ user:userReducer,match:matchReducer });

@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { ScrollView, StyleSheet } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet } from 'react-native';
 import { Text, FlatList, TextInput, View, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { ListRenderItem } from 'react-native';
@@ -9,10 +9,12 @@ import { Slider } from '@miblanchard/react-native-slider';
 import SvgUri from 'react-native-svg-uri';
 import axios from "axios";
 import { getDisplayDate } from '../../utils/dateFormat';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from '../../App';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
+import Icon from "react-native-vector-icons/SimpleLineIcons";
 import { useSelector } from 'react-redux';
+import ShowOvers from './ShowOvers';
 
 
 export interface Contest {
@@ -52,6 +54,7 @@ const Item = ({ data, date }: { data: Contest, date: any }) => (
         </View>
     </View>
 );
+const { width } = Dimensions.get("window")
 export type Props = NativeStackScreenProps<RootStackParamList, "Detail">;
 export default function Overview({ navigation, livescore, matchId, match_details, matchlive }: { navigation: any, livescore: any, matchId: string, match_details: any, matchlive: any }) {
     const { userToken, user } = useSelector((state: any) => state.user);
@@ -61,7 +64,6 @@ export default function Overview({ navigation, livescore, matchId, match_details
     const [date, setDate] = useState<Date>(new Date());
     const [contests, setContests] = useState<[]>([]);
     const renderItem: ListRenderItem<Contest> = ({ item }) => <Item data={item} date={date} />;
-    console.log(matchlive, livescore)
     useEffect(() => {
         async function getMatch() {
             const data = await axios.get(`https://backendforpuand-dream11.onrender.com/getcontests/${matchId}`);
@@ -71,7 +73,7 @@ export default function Overview({ navigation, livescore, matchId, match_details
     }, []);
     useEffect(() => {
         const i = setInterval(() => {
-            setDate(new Date());
+            //setDate(new Date());
         }, 1000);
         return () => {
             clearInterval(i);
@@ -80,40 +82,55 @@ export default function Overview({ navigation, livescore, matchId, match_details
     return (
         <View style={styles.container}>
             <View style={styles.top}>
-                <TouchableOpacity onPressIn={() => navigation.navigate('Home')}>
-                    <IonicIcon name='arrow-back' color='#FFF' size={25} />
-                </TouchableOpacity>
-                <View style={styles.matchTitle}>
-                    <Text style={styles.brightText}>{match_details?.teamHomeName}
-                        {'  '}v/s{'  '} {match_details?.teamAwayName}</Text>
-                    <Text style={styles.brightText}>
-                       {match_details?.date&&getDisplayDate(match_details.date, 'i', date)}
-                    </Text>
+                <View style={styles.backNav}>
+                    <TouchableOpacity onPressIn={() => navigation.goBack()}>
+                        <IonicIcon name='arrow-back' color='#FFF' size={25} />
+                    </TouchableOpacity>
+                    <View style={styles.matchTitle}>
+                        <Text style={styles.code}>{match_details?.teamHomeCode}
+                            {'  '}v/s{'  '} {match_details?.teamAwayCode}</Text>
+                        {(!((matchlive?.inPlay == "Yes") || (matchlive?.result == "Complete"))) ? <Text style={styles.brightText}>
+                            {(match_details?.date && getDisplayDate(match_details.date, 'i', date))}
+                        </Text> : null}
+                    </View>
                 </View>
-                <Text style={styles.brightText}>Rs.{user?.wallet}</Text>
+                {(!((matchlive?.inPlay == "Yes") || (matchlive?.result == "Complete"))) &&
+                    <TouchableOpacity onPress={() => navigation.navigate("Payment")}>
+                        <View style={styles.cash}>
+                            <Icon name="wallet" style={styles.icon} size={20} color="#FFF" />
+                            <Text style={styles.cashText}>
+                                ₹{Math.floor(user?.wallet)}{" "} </Text>
+                            <View style={styles.plusCircle}>
+                                <Text style={styles.cashText}>+</Text>
+                            </View>
+                        </View>
+                    </TouchableOpacity>
+                }
             </View>
             {livescore?.batsmanNonStriker?.batRuns &&
                 <View>
                     <View>
                         <View style={styles.teamScores}>
-                            <View style={styles.scores}>
-                                <Text style={styles.lightText}>{match_details?.teamHomeName}</Text>
-                                <Text style={styles.lightText}> {" "}
-                                    {livescore?.matchScoreDetails?.inningsScoreList[1]?.score}
-                                    /
-                                    {livescore?.matchScoreDetails?.inningsScoreList[1]
-                                        ?.wickets || 0}
-                                    (
-                                    {livescore?.matchScoreDetails?.inningsScoreList[1]?.overs}
-                                    )</Text>
+                            <View style={styles.scoresA}>
+                                <Text style={styles.lightCode}>{match_details?.teamHomeCode}</Text>
+                                <Text style={styles.lightText}>
+                                    {livescore?.matchScoreDetails?.inningsScoreList[1]?.score ?
+                                        <>{livescore?.matchScoreDetails?.inningsScoreList[1]?.score}
+                                            /
+                                            {livescore?.matchScoreDetails?.inningsScoreList[1]
+                                                ?.wickets || 0}
+                                            (
+                                            {livescore?.matchScoreDetails?.inningsScoreList[1]?.overs}
+                                            )
+                                        </> : <>-</>}</Text>
                             </View>
                             <View>
                                 <Text style={styles.status}>
                                     {matchlive?.result == "Complete" ? "Completed" : "In Play"}
                                 </Text>
                             </View>
-                            <View style={styles.scores}>
-                                <Text style={styles.lightText}>{match_details?.teamAwayName}</Text>
+                            <View style={styles.scoresB}>
+                                <Text style={styles.lightCode}>{match_details?.teamAwayCode}</Text>
                                 <Text style={styles.lightText} >
                                     {livescore?.matchScoreDetails?.inningsScoreList[0]?.score}/
                                     {livescore?.matchScoreDetails?.inningsScoreList[0]?.wickets ||
@@ -128,24 +145,34 @@ export default function Overview({ navigation, livescore, matchId, match_details
                     </View>
                     <View style={styles.separator}>
                     </View>
-                    <View>
-                        <View style={styles.player}>
-                            <Text style={styles.brightText}>
-                                {livescore?.batsmanStriker?.batName}
-                            </Text>
-                            <Text style={styles.brightText}>
-                                {livescore?.batsmanStriker?.batRuns}(
-                                {livescore?.batsmanStriker?.batBalls})
-                            </Text>
+                    <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                        <View style={{ width: "50%" }}>
+                            <View style={{ ...styles.player, marginBottom: 5 }}>
+                                <Text style={styles.brightText}>
+                                    {livescore?.batsmanStriker?.batName}
+                                </Text>
+                                <Text style={styles.brightText}>
+                                    {livescore?.batsmanStriker?.batRuns}(
+                                    {livescore?.batsmanStriker?.batBalls})
+                                </Text>
+                            </View>
+                            <View style={{ ...styles.player }}>
+                                <Text style={styles.brightText}>
+                                    {livescore?.batsmanNonStriker?.batName}
+                                </Text>
+                                <Text style={styles.brightText}>
+                                    {livescore?.batsmanNonStriker?.batRuns}(
+                                    {livescore?.batsmanNonStriker?.batBalls})
+                                </Text>
+                            </View>
                         </View>
-                        <View style={styles.player}>
-                            <Text style={styles.brightText}>
-                                {livescore?.batsmanNonStriker?.batName}
-                            </Text>
-                            <Text style={styles.brightText}>
-                                {livescore?.batsmanNonStriker?.batRuns}(
-                                {livescore?.batsmanNonStriker?.batBalls})
-                            </Text>
+                        <View style={{ width: "50%" }} >
+                            <View style={styles.playerA}>
+                                <Text style={styles.brightText}>{livescore?.bowlerStriker?.bowlName}</Text>
+                                <Text style={styles.brightText}>{livescore?.bowlerStriker?.bowlWkts}/{livescore?.bowlerStriker?.bowlRuns}
+                                    ({livescore?.bowlerStriker?.bowlOvs})</Text>
+                            </View>
+                            <ShowOvers over={livescore?.recentOvsStats} />
                         </View>
                     </View>
                 </View>}
@@ -168,8 +195,9 @@ const styles = StyleSheet.create({
     },
     matchTitle: {
         justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column'
+        alignItems: 'flex-start',
+        flexDirection: 'column',
+        marginLeft: 5
     },
     contest: {
         shadowColor: 'black',
@@ -196,6 +224,10 @@ const styles = StyleSheet.create({
         height: 60,
         padding: 10,
         width: 40
+    },
+    backNav: {
+        flexDirection: "row",
+        alignItems: "center"
     },
     subContainer: {
         flex: 1,
@@ -240,14 +272,33 @@ const styles = StyleSheet.create({
         color: 'rgb(117, 114, 114)',
         alignItems: 'center'
     },
-    scores: {
-        alignItems: 'center'
+    scoresA: {
+        alignItems: 'flex-start',
+        width: "40%",
+        justifyContent: "flex-start"
+    },
+    scoresB: {
+        alignItems: 'flex-end',
+        width: "40%",
+        justifyContent: "flex-end"
     },
     lightText: {
         color: 'rgb(117, 114, 114)'
     },
     brightText: {
         color: '#FFFFFF'
+    },
+    cashText: {
+        color: '#FFFFFF',
+        fontSize: 14
+    },
+    code: {
+        color: '#FFFFFF',
+        textTransform: "uppercase"
+    },
+    lightCode: {
+        color: 'rgb(117, 114, 114)',
+        textTransform: "uppercase"
     },
     status: {
         color: '#FFFFFF'
@@ -265,6 +316,31 @@ const styles = StyleSheet.create({
     player: {
         justifyContent: 'space-between',
         flexDirection: 'row',
-        width: '45%'
+        width: '80%'
+    },
+    playerA: {
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        width: '100%',
+        marginBottom: 5
+    },
+    cash: {
+        backgroundColor: "#3f3f3f",
+        padding: 10,
+        borderRadius: 20,
+        alignItems: "center",
+        flexDirection: "row",
+        paddingHorizontal: 15
+    },
+    icon: {
+        marginRight: 10
+    },
+    plusCircle: {
+        backgroundColor: "#6eb87e",
+        width: 20,
+        heigh: 20,
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center"
     }
 });

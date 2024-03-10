@@ -14,14 +14,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import DetailsScreen from './components/DetailsScreen';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RootStackParamList } from './components/HomeScreen';
 import { Provider } from 'react-redux';
+import { PaperProvider } from 'react-native-paper';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
 import LoginScreen from './components/auth/Login';
 import RegisterScreen from './components/auth/Register';
 import Routes from './components/routing/Routes';
 import { loadToken } from './actions/userAction';
+import { AlertNotificationRoot } from 'react-native-alert-notification';
 LogBox.ignoreLogs(['Invalid prop textStyle of type array supplied to Cell']);
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -36,43 +37,42 @@ export interface Match {
   date: any;
 }
 
-
-const Item = ({ data, date }: { data: Match, date: any }) => (
-  <View style={styles.match}>
-    <View>
-      <Text>{data.match_title}</Text>
-    </View>
-    <View style={styles.teamContainer}>
-      <View style={styles.team}>
-        <Image source={{ uri: data.teamHomeFlagUrl }} style={{ width: 40, height: 40 }} />
-        <Text>{data.home.code}</Text>
-      </View>
-      <View style={styles.team}>
-        <Text>{getDisplayDate(data.date, 'i', date)}</Text>
-      </View>
-      <View style={styles.team}>
-        <Text>{data.away.code}</Text>
-        <Image source={{ uri: data.teamAwayFlagUrl }} style={{ width: 40, height: 40 }} />
-      </View>
-    </View>
-    <View>
-      <Text>{data.match_title}</Text>
-    </View>
-  </View>
-);
+export type RootStackParamList = {
+  Entry: undefined;
+  Home: undefined;
+  Detail: { matchId: string };
+  Login: undefined,
+  Register: undefined,
+  Create: { matchId: string, editMode: Boolean, data: any },
+  Edit: { matchId: string, editMode: Boolean, data: any },
+  Routes: undefined,
+  Captain: { players: any[], matchId: string, team: any, editMode: Boolean },
+  ConDetail: { contestId: string, contest: any, matchId: string },
+  MyMatches: { userId: string }
+  Payment: undefined,
+  Balance: undefined,
+  Winners: undefined,
+  Community: undefined,
+  Settings: undefined,
+  HowToPlay: undefined,
+  TermsandConditions: undefined,
+  Help: undefined,
+  Withdraw: undefined,
+  View: { match: any, team: any, data: any },
+  Bank: undefined
+};
 
 export default function App() {
-  //console.log(userToken,'usertoken')
-  const [text, setText] = useState('');
-  const [upcoming, setUpcoming] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [date, setDate] = useState<Date>(new Date());
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor} loading={null}>
-        <Routes />
-      </PersistGate>
-    </Provider>
+    <PaperProvider>
+      <AlertNotificationRoot>
+        <Provider store={store}>
+          <PersistGate persistor={persistor} loading={null}>
+            <Routes />
+          </PersistGate>
+        </Provider>
+      </AlertNotificationRoot>
+    </PaperProvider>
   );
 }
 

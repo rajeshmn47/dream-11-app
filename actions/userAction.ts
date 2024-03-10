@@ -49,7 +49,6 @@ export const register = (myform:any) => async (dispatch:any) => {
     localStorage.setItem("server_token", data.server_token);
     dispatch({ type: REGISTER_USER_SUCCESS, payload: data.user });
   } catch (error:any) {
-    console.log(error.response, "asdfgh");
     dispatch({
       type: REGISTER_USER_FAIL,
       payload: error.response.data.message,
@@ -66,7 +65,6 @@ export const login = (myform:any) => async (dispatch:any) => {
     localStorage.setItem("token", data.token);
     dispatch({ type: LOGIN_SUCCESS, payload: data.user });
   } catch (error:any) {
-    console.log(error.response, "asdfgh");
     dispatch({ type: LOGIN_FAIL, payload: error.response.data.message });
   }
 };
@@ -78,18 +76,15 @@ export const forgot = (email:any) => async (dispatch:any) => {
     localStorage.setItem("token", data.token);
     dispatch({ type: LOGIN_SUCCESS, payload: data.user });
   } catch (error:any) {
-    console.log(error.response, "asdfgh");
     dispatch({ type: LOGIN_FAIL, payload: error.response.data.message });
   }
 };
 
 export const logout = () => async (dispatch:any) => {
   try {
-    console.log('logging out')
     await AsyncStorage.removeItem("server_token");
     dispatch({type:LOGOUT_SUCCESS})
   } catch (error:any) {
-    console.log(error.response, "asdfgh");
     dispatch({ type: LOGIN_FAIL, payload: error.response.data.message });
   }
 };
@@ -98,7 +93,6 @@ export const addconfetti = () => async (dispatch:any) => {
   try {
     dispatch({ type: ADD_CONFETTI });
   } catch (error:any) {
-    console.log(error.response, "asdfgh");
     dispatch({ type: LOGIN_FAIL, payload: error.response.data.message });
   }
 };
@@ -107,7 +101,6 @@ export const removeconfetti = () => async (dispatch:any) => {
   try {
     dispatch({ type: REMOVE_CONFETTI });
   } catch (error:any) {
-    console.log(error.response, "asdfgh");
     dispatch({ type: LOGIN_FAIL, payload: error.response.data.message });
   }
 };
@@ -128,9 +121,7 @@ export const loadUser = () => async (dispatch:any) => {
     const servertoken = await AsyncStorage.getItem("server_token");
     dispatch({ type: LOAD_USER_REQUEST });
     const { data } = await API.get(`/auth/loaduser`);
-    console.log(data?.message,'message')
     if (data?.message) {
-      console.log(data.message,'message')
       dispatch({ type: LOAD_USER_SUCCESS, payload: data.message });
     }
   } catch (error) {

@@ -10,7 +10,7 @@ import { Slider } from '@miblanchard/react-native-slider';
 import SvgUri from 'react-native-svg-uri';
 import axios from "axios";
 import { getDisplayDate } from '../utils/dateFormat';
-import { RootStackParamList } from './HomeScreen';
+import { RootStackParamList } from './../App';
 import { getmatch } from "../actions/matchAction";
 import { getDatabase, onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,6 +35,8 @@ import db from "../firebase/config";
 import Overview from './topbar/Overview';
 import { URL } from '../constants/userConstants';
 import { checkar, checkwk } from '../utils/playersFilter';
+import { API } from '../actions/userAction';
+import Loader from './loader/Loader';
 
 
 export interface Contest {
@@ -112,7 +114,6 @@ export default function CreateTeam({ navigation, route }: Props) {
     </View>
   );
 
-
   const FourthRoute = () => (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
       <View>
@@ -142,12 +143,11 @@ export default function CreateTeam({ navigation, route }: Props) {
     { key: 'bowl', title: 'Bowl' }
   ]);
   const renderItem: ListRenderItem<Contest> = ({ item }) => <Item data={item} date={date} />;
-
   useEffect(() => {
     async function getupcoming() {
+      setLoading(true);
       if (route.params.matchId) {
-        setLoading(true);
-        const data = await axios.get(`${URL}/getplayers/${route.params.matchId}`);
+        const data = await API.get(`${URL}/getplayers/${route.params.matchId}`);
         setLive(data.data.live);
         let awayPlayers: [] = data.data.matchdetails.teamAwayPlayers.map((obj: any) => ({
           ...obj,
@@ -161,14 +161,20 @@ export default function CreateTeam({ navigation, route }: Props) {
         }));
         if (!data.data.live) {
           if (route.params?.editMode) {
+            console.log(route.params?.editMode, 'editnotlivemodeee')
             const p: any[] = awayPlayers.concat(homePlayers).map((obj: any) => ({
               ...obj,
               isSelected: false,
             }));
             setPlayers([
-              ...p.slice(0, 8)]
-            );
+              ...p.map((r) =>
+                (route.params.data?.players).find((f: any) => f.playerId == r.playerId)
+                  ? { ...r, isSelected: true }
+                  : r
+              ),
+            ]);
           } else {
+            console.log(route.params?.editMode, 'notlivemodeonly')
             const p: any[] = awayPlayers.concat(homePlayers).map((obj: any) => ({
               ...obj,
               isSelected: false,
@@ -177,14 +183,20 @@ export default function CreateTeam({ navigation, route }: Props) {
           }
         } else {
           if (route.params?.editMode) {
+            console.log(route.params?.editMode, 'editlivemode')
             const p: any[] = awayPlayers.concat(homePlayers).map((obj: any) => ({
               ...obj,
               isSelected: false,
             }));
             setPlayers([
-              ...p.slice(0, 8)
+              ...p.map((r) =>
+                route.params.data.players.find((f: any) => f.playerId == r.playerId)
+                  ? { ...r, isSelected: true }
+                  : r
+              ),
             ]);
           } else {
+            console.log(route.params?.editMode, 'livemodeonly')
             const p: any[] = awayPlayers
               .splice(0, 11)
               .concat(homePlayers.splice(0, 11))
@@ -192,7 +204,7 @@ export default function CreateTeam({ navigation, route }: Props) {
                 ...obj,
                 isSelected: false,
               }));
-            setPlayers([...p.slice(0, 8)]);
+            setPlayers([...p]);
           }
         }
         setMatch(data.data.matchdetails);
@@ -218,14 +230,14 @@ export default function CreateTeam({ navigation, route }: Props) {
       setLoading(false);
     }
     getupcoming();
-  }, [route.params.matchId]);
+  }, [route.params.matchId, route.params.editMode]);
   useEffect(() => {
     async function getplayers() {
       if (user?._id && match) {
-        const data = await axios.get(
+        const data = await API.get(
           `${URL}/getteam/${match?.titleFI}/${match.titleSI}`
         );
-        const moredata = await axios.get(
+        const moredata = await API.get(
           `${URL}/getteam/${match?.titleSI}/${match?.titleFI}`
         );
         setLmplayers([...data.data.lmplayers]);
@@ -233,6 +245,7 @@ export default function CreateTeam({ navigation, route }: Props) {
     }
     getplayers();
   }, [match, user]);
+
   const handleClick = (i: string) => {
     const po = players.map((p) => {
       if (p._id === i) {
@@ -255,7 +268,7 @@ export default function CreateTeam({ navigation, route }: Props) {
 
   const handleNext = () => {
     if (players.filter((k) => k.isSelected === true).length == 11) {
-      navigation.navigate('Captain', { players: players.filter((p) => p.isSelected == true), matchId: route.params.matchId })
+      navigation.navigate('Captain', { players: players.filter((p) => p.isSelected == true), matchId: route.params.matchId, team: route.params.data, editMode: route.params.editMode })
     }
   };
 
@@ -265,7 +278,7 @@ export default function CreateTeam({ navigation, route }: Props) {
       onPress={!data.isSelected ? () => handleClick(data._id) : () => handleRemove(data._id)}>
       <View style={data.isSelected ? styles.pSelected : styles.notSelected}>
         <View style={!data.isSelected ? styles.teamContainer : styles.selected}>
-          <View>
+          <View style={{ backgroundColor: "transparent" }}>
             <Image source={{ uri: getImgurl(data.image, data.playerName) }} style={{ width: 35, height: 35 }} />
           </View>
           <View style={styles.team}>
@@ -291,7 +304,63 @@ export default function CreateTeam({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.matchInfo}>
+        <View style={styles.info}>
+          <Text style={styles.bright}>Players</Text>
+          <Text style={styles.bright}>{players.filter((k) => k.isSelected === true).length}/11</Text>
+        </View>
+        <View style={styles.info}>
+          <Text style={styles.bright}>
+            {match_details?.teamHomeCode}
+          </Text>
+          <Text style={styles.bright} >
+            {
+              match?.teamHomePlayers.filter((f: any) =>
+              players?.filter((k) => k.isSelected === true)?.some((s: any) => f.playerId == s.playerId)
+              ).length
+            }
+          </Text>
+        </View>
+        <View style={styles.info}>
+          <Text style={styles.bright}>
+            {match_details?.teamHomeCode}
+          </Text>
+          <Text style={styles.bright} >
+            {
+              match?.teamAwayPlayers.filter((f: any) =>
+              players?.filter((k) => k.isSelected === true)?.some((s: any) => f.playerId == s.playerId)
+              ).length
+            }
+          </Text>
+        </View>
+        <View style={styles.info}>
+          <Text  style={styles.bright}>Credits Left</Text>
+          <Text  style={styles.bright}>100</Text>
+        </View>
+      </View>
+      <View style={styles.boxes}>
+        {players.filter((k) => k.isSelected === true).length <= 11 &&
+          players
+            .filter((k) => k.isSelected === true)
+            .map((p, i: number) => (
+              <View style={styles.sBox}>
+                <Text style={styles.sText}>{i + 1}</Text>
+              </View>
+            ))}
+        {players.filter((k) => k.isSelected === true).length <= 11 &&
+          players
+            .slice(
+              0,
+              11 - players.filter((k) => k.isSelected === true).length
+            )
+            .map((g, i) => (
+              <View style={styles.nBox}>
+                <Text style={styles.nText}>{i + 1 + players.filter((k) => k.isSelected === true).length}</Text>
+              </View>
+            ))}
+      </View>
       <View style={styles.players}>
+        <Loader loading={loading} />
         <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}
@@ -338,7 +407,7 @@ export default function CreateTeam({ navigation, route }: Props) {
             }
             pointerEvents={players.filter((k) => k.isSelected === true).length >= 11 ? 'none' : 'auto'}
           >
-            <Text>next</Text>
+            <Text style={styles.bright}>next</Text>
           </View>
         </TouchableHighlight>
       </View>
@@ -348,17 +417,10 @@ export default function CreateTeam({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFF',
     color: 'white',
   },
   contest: {
-    shadowColor: 'black',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
     elevation: 14,
     margin: 15,
     borderRadius: 10,
@@ -367,25 +429,16 @@ const styles = StyleSheet.create({
     padding: 5
   },
   pSelected: {
-    shadowColor: 'black',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 14,
-    margin: 15,
-    borderRadius: 10,
-    height: 100,
-    backgroundColor: 'white',
-    padding: 5
+    height: 80,
+    borderBottomColor: "#ccc",
+    borderBottomWidth: 1,
+    backgroundColor: '#8abb9d'
   },
   team: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     color: 'white',
     flexDirection: 'row',
     height: 60,
@@ -408,27 +461,27 @@ const styles = StyleSheet.create({
   },
   teamContainer: {
     flex: 1,
-    backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'space-between',
     color: 'white',
     flexDirection: 'row',
     height: 70,
-    padding: 2,
+    padding: 0,
     borderRadius: 2,
-    width:'100%'
+    width: '100%',
+    backgroundColor: '#FFF',
+    borderBottomColor: "#ccc",
+    borderBottomWidth: 2
   },
   selected: {
     flex: 1,
-    backgroundColor:'#FFF',
     alignItems: 'center',
     justifyContent: 'space-between',
     color: 'white',
     flexDirection: 'row',
     height: 70,
-    padding: 2,
     borderRadius: 2,
-    width:'100%'
+    width: '100%'
   },
   preview: {
     flex: 1,
@@ -458,12 +511,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
     alignItems: 'center',
     justifyContent: 'space-evenly',
-    color: 'white',
+    color: '#FFF',
     flexDirection: 'row',
     height: 40,
     padding: 2,
     borderRadius: 15,
-    width: '50%'
+    width: '100%'
   },
   matchTop: {
     borderBottomColor: '#DDDDDD',
@@ -478,15 +531,9 @@ const styles = StyleSheet.create({
     fontSize: 10
   },
   notSelected: {
-    backgroundColor: '#9e7044',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    color: 'white',
-    flexDirection: 'row',
-    height: 70,
-    padding: 2,
-    borderRadius: 2,
+    padding: 0,
+    borderRadius: 10,
+    height: 80
   },
   disabled: {
     backgroundColor: 'grey',
@@ -526,4 +573,48 @@ const styles = StyleSheet.create({
   secondTab: {
     backgroundColor: '#2d2d2d'
   },
+  boxes: {
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    flexDirection: 'row',
+    marginVertical: 10
+  },
+  nBox: {
+    width: 25,
+    height: 20,
+    borderColor: "#47814c",
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    flexDirection: 'row'
+  },
+  sBox: {
+    width: 25,
+    height: 20,
+    borderColor: "#47814c",
+    backgroundColor: "#47814c",
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    flexDirection: 'row'
+  },
+  nText: {
+    color: "#47814c"
+  },
+  sText: {
+    color: "#FFFFFF"
+  },
+  matchInfo: {
+    height: 80,
+    backgroundColor: "#212121",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: 10,
+    paddingVertical: 10
+  },
+  info:{
+    justifyContent:"center",
+    alignItems:"center"
+  }
 });

@@ -8,9 +8,8 @@ import FastImage from 'react-native-fast-image';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Slider } from '@miblanchard/react-native-slider';
 import SvgUri from 'react-native-svg-uri';
-import axios from "axios";
 import { getDisplayDate } from '../utils/dateFormat';
-import { RootStackParamList } from './HomeScreen';
+import { RootStackParamList } from './../App';
 import { getmatch } from "../actions/matchAction";
 import { getDatabase, onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,6 +35,7 @@ import Overview from './topbar/Overview';
 import { URL } from '../constants/userConstants';
 import { checkar, checkwk } from '../utils/playersFilter';
 import { API } from '../actions/userAction';
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
 
 export interface Contest {
@@ -83,8 +83,8 @@ export default function SelectCaptain({ navigation, route }: Props) {
             setPlayers([...route.params.players])
             const pl = route.params.players.map((obj) => ({
                 ...obj,
-                isCaptain: false,
-                isViceCaptain: false,
+                isCaptain: obj.playerId == route.params.team?.captainId ? true : false,
+                isViceCaptain: obj.playerId == route.params.team?.viceCaptainId ? true : false,
             }))
             setPlayers([...pl])
         }
@@ -137,40 +137,69 @@ export default function SelectCaptain({ navigation, route }: Props) {
     }
 
     const handleSave = () => {
-        console.log('saving')
         const dataToSend: any = {
             players: players,
             matchId: route.params.matchId,
-            userid: user._id,
             captainId: players.find((p) => p.isCaptain == true).playerId,
             vicecaptainId: players.find((p) => p.isViceCaptain == true).playerId,
         }
-        fetch(`${URL}/saveteam/${route.params.matchId}`, {
-            method: 'POST',
-            body: JSON.stringify(dataToSend),
-            headers: {
-                //Header Defination
-                'Content-Type': "application/json",
-            },
-        }).then((response) => response.json())
-            .then((responseJson) => {
+        let url = route.params.editMode ? `${URL}/updateTeam/${route.params.team?._id}` : `${URL}/saveteam/${route.params.matchId}`;
+        if (route.params.editMode) {
+            API.put(url, dataToSend).then((responseJson) => {
                 //Hide Loader
                 setLoading(false);
+                Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: 'Success',
+                    textBody: 'Congrats! your team is created successfully',
+                    autoClose: 500
+                })
+                navigation.navigate('Detail', { matchId: route.params.matchId });
                 // If server response message same as Data Matched
             }).catch((error: any) => {
                 console.error(error)
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Failure',
+                    textBody: error.response.data.message,
+                    autoClose: 500
+                })
+                navigation.navigate('Detail', { matchId: route.params.matchId });
                 // Error; SMS not sent
                 // ...
             });
-
-        navigation.navigate('Detail', { matchId: route.params.matchId });
+        }
+        else {
+            API.post(url, dataToSend).then((responseJson) => {
+                //Hide Loader
+                setLoading(false);
+                Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: 'Success',
+                    textBody: 'Congrats! your team is created successfully',
+                    autoClose: 500
+                })
+                navigation.navigate('Detail', { matchId: route.params.matchId });
+                // If server response message same as Data Matched
+            }).catch((error: any) => {
+                console.error(error)
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Failure',
+                    textBody: error.response.data.message,
+                    autoClose: 500
+                })
+                navigation.navigate('Detail', { matchId: route.params.matchId });
+                // Error; SMS not sent
+                // ...
+            });
+        }
     };
     const Item = ({ data, date }: { data: Contest, date: any }) => (
-
         <View>
             <View style={styles.playerContainer}>
-                <View>
-                    <Image source={{ uri: getImgurl(data.image, data.playerName) }} style={{ width: 35, height: 35 }} />
+                <View style={{ height: "100%", alignItems: "center", justifyContent: "center" }}>
+                    <Image source={{ uri: getImgurl(data.image, data.playerName) }} style={{ height: 50, width: 50, borderRadius: 5 }} />
                 </View>
                 <View style={styles.team}>
                     <Text>{data.playerName}</Text>
@@ -223,7 +252,7 @@ export default function SelectCaptain({ navigation, route }: Props) {
                         }
                         pointerEvents={isCandVcselected() ? 'none' : 'auto'}
                     >
-                        <Text>save</Text>
+                        <Text style={styles.bright}>save</Text>
                     </View>
                 </TouchableHighlight>
             </View>
@@ -277,7 +306,6 @@ const styles = StyleSheet.create({
         resizeMode: 'stretch',
     },
     playerContainer: {
-        flex: 1,
         backgroundColor: 'white',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -285,7 +313,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: 70,
         padding: 2,
-        borderRadius: 2,
+        borderBottomWidth: 1,
+        borderColor: "#CCC"
     },
     preview: {
         flex: 1,
@@ -303,24 +332,27 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
         alignItems: 'center',
-        justifyContent: 'space-evenly',
+        justifyContent: 'space-between',
         color: 'white',
         flexDirection: 'row',
         height: 10,
         padding: 2,
         borderRadius: 2,
-        zIndex: 0
+        zIndex: 0,
+        position: "absolute",
+        bottom: "10%",
+        width: "100%"
     },
     next: {
         backgroundColor: 'green',
         alignItems: 'center',
         justifyContent: 'space-evenly',
-        color: 'white',
+        color: '#FFF',
         flexDirection: 'row',
         height: 40,
         padding: 2,
         borderRadius: 15,
-        width: '50%'
+        width: '100%'
     },
     matchTop: {
         borderBottomColor: '#DDDDDD',
@@ -365,7 +397,7 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 2,
         borderRadius: 15,
-        width: '50%'
+        width: '100%'
     },
     notDisabled: {
         alignItems: 'center',
@@ -381,39 +413,41 @@ const styles = StyleSheet.create({
         zIndex: 10
     },
     bright: {
-        color: '#FFFFFF'
+        color: '#FFFFFF',
+        textAlign: "center"
     },
     dark: {
-        color: '#000000'
+        color: '#000000',
+        textAlign: "center"
     },
     captain: {
-        borderRadius: 10,
+        borderRadius: 12.5,
         backgroundColor: '#000000',
         color: '#FFFFFF',
         borderColor: '#CCCCCC',
-        height: 20,
-        width: 20,
+        height: 25,
+        width: 25,
         marginRight: 5,
         alignItems: 'center',
         justifyContent: 'center'
     },
 
     vCaptain: {
-        borderRadius: 10,
+        borderRadius: 12.5,
         backgroundColor: '#000000',
         color: '#FFFFFF',
         borderColor: '#CCCCCC',
-        height: 20,
-        width: 20,
+        height: 25,
+        width: 25,
         marginLeft: 5,
         alignItems: 'center',
         justifyContent: 'center'
     },
     no: {
-        borderRadius: 10,
+        borderRadius: 12.5,
         borderColor: '#CCCCCC',
-        height: 20,
-        width: 20,
+        height: 25,
+        width: 25,
         borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',

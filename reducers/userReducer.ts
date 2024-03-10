@@ -44,7 +44,6 @@ import {
 } from "../constants/userConstants";
 
 export const userReducer = (state = { user: {} }, action: any) => {
-  console.log(action, 'actiontoken')
   switch (action.type) {
     case REGISTER_USER_REQUEST:
     case LOGIN_REQUEST:

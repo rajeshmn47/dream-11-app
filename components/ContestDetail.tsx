@@ -8,7 +8,6 @@ import FastImage from 'react-native-fast-image';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Slider } from '@miblanchard/react-native-slider';
 import SvgUri from 'react-native-svg-uri';
-import axios from "axios";
 import { getDisplayDate } from '../utils/dateFormat';
 import { RootStackParamList } from './HomeScreen';
 import { getmatch } from "../actions/matchAction";
@@ -41,6 +40,7 @@ import SelectTeams from './SelectTeams';
 import ConfirmModal from './ConfirmModal';
 import Scorecard from './Scorecard';
 import Stats from './Stats';
+import { API } from '../actions/userAction';
 
 
 export interface Contest {
@@ -153,8 +153,8 @@ export default function ContestDetail({ navigation, route }: Props) {
     useEffect(() => {
         async function getteams() {
             if (route.params.contestId.length > 3) {
-                const teamdata = await axios.get(`${URL}/getteamsofcontest/${route.params.contestId}`);
-                const contestdata = await axios.get(`${URL}/getcontest/${route.params.contestId}`);
+                const teamdata = await API.get(`${URL}/getteamsofcontest/${route.params.contestId}`);
+                const contestdata = await API.get(`${URL}/getcontest/${route.params.contestId}`);
                 setMyContest(contestdata.data.contest);
                 setMatch(teamdata.data.match);
                 const t = teamdata.data.teams.sort((a: any, b: any) => a._doc.points - b._doc.points);
@@ -171,7 +171,7 @@ export default function ContestDetail({ navigation, route }: Props) {
                 all.push(t.prize);
             });
         }
-        setPrizes([...all.map((index: number, a: any) => [index + 1, a])]);
+        setPrizes([...all.map((index: number, a: any) => [index, a + 1])]);
     }, [myContest]);
 
 
@@ -188,7 +188,7 @@ export default function ContestDetail({ navigation, route }: Props) {
                                 key={index}
                                 data={rowData}
                                 widthArr={widthArr}
-                                style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
+                                style={[styles.row, index % 2 && { backgroundColor: '#ffffff' }]}
                                 textStyle={styles.text}
                             />
                         ))
@@ -211,7 +211,7 @@ export default function ContestDetail({ navigation, route }: Props) {
                                 key={index}
                                 data={rowData}
                                 widthArr={lWidthArr}
-                                style={[styles.row, index % 2 ? { backgroundColor: '#26793b' } : { backgroundColor: '#ffffff' }]}
+                                style={[styles.row, index % 2 ? { backgroundColor: '#ffffff' } : { backgroundColor: '#ffffff' }]}
                                 textStyle={styles.text}
                             />
                         ))
@@ -261,14 +261,13 @@ export default function ContestDetail({ navigation, route }: Props) {
                     </View>
                     <View style={styles.conBottom}>
                         <View>
-
                             <Text>
                                 ₹{Math.floor(myContest?.price / myContest?.totalSpots)}
                             </Text>
                         </View>
                         <View style={styles.cRow}>
                             <View>
-                                <Icon name="trophy" />
+                                <Icon name="trophy" style={styles.icon} />
                             </View>
                             <Text>
                                 {Math.floor((myContest?.numWinners / myContest?.totalSpots * 100))}%
@@ -534,7 +533,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row',
-        backgroundColor: '#bebebe'
+        backgroundColor: '#ffffff'
     },
     cRow: {
         justifyContent: 'space-between',
@@ -636,5 +635,8 @@ const styles = StyleSheet.create({
     wrapper: { flexDirection: 'row' },
     title: { flex: 1, backgroundColor: '#f6f8fa' },
     header: { height: 50, backgroundColor: '#537791' },
-    dataWrapper: { marginTop: -1 }
+    dataWrapper: { marginTop: -1 },
+    icon: {
+        marginRight: 5
+    }
 });

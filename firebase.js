@@ -1,4 +1,6 @@
 import firebase from "firebase";
+import { initializeApp } from "firebase/app";
+import { initializeFirestore } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -15,7 +17,9 @@ const firebaseConfig = {
   measurementId: "G-SC62SMG6E5",
 };
 
-const firebaseApp = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+});
 
 export default db;

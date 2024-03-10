@@ -24,7 +24,7 @@ export default function BottomBar({ navigation, route }: { navigation: any, rout
                     <Text style={styles.textColor}>Home</Text>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('MyMatches', { userId: user._id })}>
+            <TouchableOpacity onPress={() => navigation.navigate('MyMatches', { userId: user?._id })}>
                 <View style={route.name == "MyMatches" ? styles.selected : styles.iconContainer}>
                     <View style={{ marginBottom: 10 }}>
                         <Octicons name="database" color="#fff" size={20} />
@@ -32,18 +32,22 @@ export default function BottomBar({ navigation, route }: { navigation: any, rout
                     <Text style={styles.textColor}>My Matches</Text>
                 </View>
             </TouchableOpacity>
-            <View style={styles.iconContainer}>
-                <View style={{ marginBottom: 10 }}>
-                    <IonicIcon name="people-outline" color="#fff" size={20} />
+            <TouchableOpacity onPress={() => navigation.navigate('Community')}>
+                <View style={route.name == "Community" ? styles.selected : styles.iconContainer}>
+                    <View style={{ marginBottom: 10 }}>
+                        <IonicIcon name="people-outline" color="#fff" size={20} />
+                    </View>
+                    <Text style={styles.textColor}>Community</Text>
                 </View>
-                <Text style={styles.textColor}>Community</Text>
-            </View>
-            <View style={styles.iconContainer}>
-                <View style={{ marginBottom: 10 }}>
-                    <AwesomeIcon name="medal" color="#fff" size={20} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Winners')}>
+                <View style={route.name == "Winners" ? styles.selected : styles.iconContainer}>
+                    <View style={{ marginBottom: 10 }}>
+                        <AwesomeIcon name="medal" color="#fff" size={20} />
+                    </View>
+                    <Text style={styles.textColor}>Winners</Text>
                 </View>
-                <Text style={styles.textColor}>Winners</Text>
-            </View>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -52,13 +56,13 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#3d7940',
         color: 'white',
-        height: "11%",
+        height: "10%",
         alignItems: 'center',
         justifyContent: 'space-between',
         flexDirection: 'row',
         position: 'absolute',
         left: 0,
-        bottom: "-1%"
+        bottom: "1%"
     },
     iconContainer: {
         backgroundColor: '#3d7940',
@@ -66,8 +70,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        height:'100%',
-        width:w/4
+        height: '100%',
+        width: w / 4
     },
     selected: {
         backgroundColor: '#000000',
@@ -76,7 +80,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'column',
         width: w / 4,
-        height:'100%'
+        height: '100%'
     },
     match: {
         shadowColor: 'black',

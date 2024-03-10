@@ -17,7 +17,8 @@ const firebaseConfig = {
   measurementId: "G-SC62SMG6E5",
 };
 export const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = initializeFirestore(app, { experimentalForceLongPolling: true, });
+//const db = getFirestore(app, { experimentalForceLongPolling: true, });
 export const storage = getStorage(app);
 export default db;
 //const db = getFirestore(app);

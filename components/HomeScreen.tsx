@@ -1,17 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { Dimensions, RefreshControl, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Text, FlatList, TextInput, View, Image, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ListRenderItem } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
 import axios from "axios";
-import { getDisplayDate } from '../utils/dateFormat';
+import { getDisplayDate, hoursRemaining, isTommorrow, sameDayorNot } from '../utils/dateFormat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { loadToken, logout } from '../actions/userAction';
+import { API, loadToken, logout } from '../actions/userAction';
 import { useDispatch, useSelector } from 'react-redux';
 import Navbar from './navbar/Navbar';
 import BottomBar from './BottomBar';
+import Mega from "./homescreen/Mega";
 import { SceneMap, TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 import { SvgUri } from 'react-native-svg';
 import {
@@ -29,20 +30,9 @@ import {
 import { TabItemProps } from '@rneui/themed';
 import { URL } from '../constants/userConstants';
 import Loader from './loader/Loader';
+import { Timer } from './Timer';
+import { RootStackParamList } from '../App';
 
-
-export type RootStackParamList = {
-    Entry: undefined;
-    Home: undefined;
-    Detail: { matchId: string };
-    Login: undefined,
-    Register: undefined,
-    Create: { matchId: string, editMode: Boolean },
-    Routes: undefined,
-    Captain: { players: any[], matchId: string },
-    ConDetail: { contestId: string, contest: any, matchId: string },
-    MyMatches: { userId: string }
-};
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -55,22 +45,25 @@ export interface Match {
     teamHomeFlagUrl: string;
     teamAwayFlagUrl: string;
     date: any;
+    livestatus: string;
+    lineups: string;
 }
 
 const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: any }) => {
     const openPopup = () => {
-        console.log(data.id, 'id')
         navigation.navigate('Detail', { matchId: data.id })
     }
     return (
         <TouchableOpacity onPress={() => openPopup()}>
             <View style={styles.match}>
-                <View>
-                    <Text style={styles.title}>{data.match_title}</Text>
+                <View style={styles.topBar}>
+                    <Text numberOfLines={1} style={styles.title}>{data?.match_title}</Text>
+                    <Text style={styles.greenText}>{data?.lineups}</Text>
                 </View>
                 <View style={styles.teamContainer}>
                     <View style={styles.team}>
-                        <SvgUri
+                        <View style={styles.imageContainer}>
+                            <SvgUri
                             onError={() =>
                                 console.log('error')
                             }
@@ -79,14 +72,14 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                             style={{ marginRight: 10 }}
                             uri={data.teamHomeFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
                         />
+                        </View>
                         <Text style={styles.code}>{data.home.code}</Text>
                     </View>
-                    <View style={styles.matchDate}>
-                        <Text style={styles.dateText}>{getDisplayDate(data.date, 'i', date)}</Text>
-                    </View>
+                    <Timer matchDate={data?.date} />
                     <View style={styles.team}>
                         <Text style={styles.code}>{data.away.code}</Text>
-                        <SvgUri
+                        <View style={styles.imageContainer}>
+                            <SvgUri
                             onError={() =>
                                 console.log('error')
                             }
@@ -94,45 +87,58 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                             height="40"
                             style={{ marginLeft: 10 }}
                             uri={data.teamAwayFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
-                        />
+                           />
+                        
+                        </View>
                     </View>
                 </View>
-                <View>
-                    <Text style={styles.title}>{data.match_title}</Text>
+                <View style={styles.bottom}>
+                    <View style={styles.bottomLeft}>
+                        <Mega />
+                        <Text style={{ fontWeight: "200" }}>₹59 Crores</Text>
+                    </View>
+                    <Text style={styles.headings} numberOfLines={1}>{data?.home?.name} vs {data?.away?.name}</Text>
                 </View>
             </View>
         </TouchableOpacity>
     );
 }
-const { height, width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
+
 export default function HomeScreen({ navigation, route }: Props) {
     const dispatch: any = useDispatch();
+    const { userToken, user } = useSelector((state: any) => state.user);
     const [text, setText] = useState('');
     const [upcoming, setUpcoming] = useState<any[]>();
+    const [completed, setCompleted] = useState<any[]>([])
     const [loading, setLoading] = useState<Boolean>(false);
+    const [refreshing, setRefreshing] = useState<Boolean>(false);
     const [date, setDate] = useState<Date>(new Date());
     const layout = useWindowDimensions();
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
         { key: 'upcoming', title: 'Upcoming' },
         { key: 'featured', title: 'Featured' }]);
-    const renderItem: ListRenderItem<Match> = ({ item }) => <Item data={item} date={date} navigation={navigation} />;
+    const renderItem: ListRenderItem<Match> = ({ item }) => <Item data={item} date={new Date()} navigation={navigation} />;
     useEffect(() => {
-        async function getupcoming() {
-            setLoading(true);
-            try {
-                const response = await fetch(`${URL}/home`);
-                const json: any = await response.json();
-                const a: [] = json.upcoming.results.sort(
-                    (c: any, d: any) => new Date(c.date).valueOf() - new Date(d.date).valueOf()
-                );
-                setUpcoming([...a]);
-            } catch (error) {
-            }
-            setLoading(false);
+        if (user?._id) {
+            refreshHandler();
         }
-        getupcoming();
-    }, []);
+    }, [user]);
+
+    async function refreshHandler() {
+        setRefreshing(true);
+        try {
+            const response = await API.get(`${URL}/homeMatches`);
+            const a: [] = response.data.upcoming.results.filter((m: any) => new Date() < new Date(m.date)).sort(
+                (c: any, d: any) => new Date(c.date).valueOf() - new Date(d.date).valueOf()
+            );
+            setUpcoming([...a]);
+            setRefreshing(false);
+        } catch (error) {
+            setRefreshing(false);
+        }
+    }
 
     const FirstRoute = () => (
         <View style={{ flex: 1, backgroundColor: '#ffffff' }} >
@@ -142,6 +148,12 @@ export default function HomeScreen({ navigation, route }: Props) {
                         data={upcoming}
                         renderItem={renderItem}
                         keyExtractor={(item: any) => item._id}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing ? true : false}
+                                onRefresh={refreshHandler}
+                            />
+                        }
                     />
                 </View>
             </View>
@@ -166,10 +178,14 @@ export default function HomeScreen({ navigation, route }: Props) {
         upcoming: FirstRoute,
         featured: SecondRoute
     });
-    console.log(upcoming?.length, 'upcoming')
+
     return (
         <View style={styles.container}>
-            <Navbar />
+            <Navbar navigation={navigation} />
+            <Loader loading={loading} />
+            <View style={styles.titleContainer}>
+                <Text style={styles.heading}>Upcoming Matches</Text>
+            </View>
             <View style={styles.tabsContainer}>
                 <TabView
                     navigationState={{ index, routes }}
@@ -227,6 +243,10 @@ const styles = StyleSheet.create({
     secondTab: {
         backgroundColor: '#FFFFFF'
     },
+    imageContainer: {
+        width: 40,
+        height: 40
+    },
     match: {
         shadowColor: 'black',
         shadowOffset: {
@@ -241,8 +261,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         height: 160,
         backgroundColor: 'white',
-        padding: 10,
-        paddingHorizontal: 10
+        overflow: "hidden"
     },
     team: {
         backgroundColor: 'white',
@@ -278,6 +297,20 @@ const styles = StyleSheet.create({
         height: 70,
         padding: 2,
         borderRadius: 2,
+        paddingHorizontal: 10
+    },
+    topBar: {
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        paddingHorizontal: 10,
+        paddingVertical: 5
+    },
+    greenText: {
+        overflow: 'hidden',
+        fontSize: 18,
+        fontWeight: '600',
+        color: "#398d44"
     },
     matchTop: {
         borderBottomColor: '#DDDDDD',
@@ -292,20 +325,64 @@ const styles = StyleSheet.create({
         width: 130,
         fontSize: 10,
         alignItems: 'center',
-        fontWeight: '200'
+        fontWeight: '200',
+        justifyContent: 'center',
+        alignContent: 'center'
+    },
+    date: {
+        fontWeight: "200",
+        fontSize: 12
+    },
+    hours: {
+        fontWeight: "200"
     },
     dateText: {
         fontSize: 12,
         color: 'rgb(130, 130, 130)'
     },
     title: {
-        overflow: 'hidden',
+        width: "70%",
         fontSize: 14,
         fontWeight: '200'
+    },
+    headings: {
+        width: "50%",
+        fontSize: 14,
+        fontWeight: '200',
+        textTransform: "capitalize",
+        textAlign: "right"
+    },
+    titleContainer: {
+        backgroundColor: "#e7e7e7",
+        marginBottom: 0,
+        paddingVertical: 5,
+        paddingHorizontal: 15,
+        height: "5%"
+        //alignItems: 'center',
+        //justifyContent: 'center'
+    },
+    heading: {
+        overflow: 'hidden',
+        fontSize: 18,
+        fontWeight: '200',
+        backgroundColor: "transparent"
     },
     code: {
         overflow: 'hidden',
         fontSize: 14,
         fontWeight: 'bold'
+    },
+    bottom: {
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row",
+        backgroundColor: "#fafafa",
+        padding: 10
+    },
+    bottomLeft: {
+        width: 130,
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row"
     }
 });

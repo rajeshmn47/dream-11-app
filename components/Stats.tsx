@@ -18,12 +18,12 @@ export interface Contest {
     isViceCaptain: Boolean;
 }
 
-const width=Dimensions.get('window').width;
+const width = Dimensions.get('window').width;
 export type Props = NativeStackScreenProps<RootStackParamList, "Captain">;
 export default function Stats({ matchdata, team, route }: { matchdata: any, team: any, route: any }) {
     const [tableHead, setTableHead] = useState<any[]>(['playerName', 'points']);
     const [tableTitle, setTableTitle] = useState(['playerName', 'points', 'c']);
-    const [widthArr, setWidthArr] = useState<any[]>([width/2, width/2])
+    const [widthArr, setWidthArr] = useState<any[]>([width / 2, width / 2])
     const [tableData, setTableData] = useState([
         ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
         ['a', 'b', 'c', '1', '2', '3', '1', '2', '3'],
@@ -43,7 +43,7 @@ export default function Stats({ matchdata, team, route }: { matchdata: any, team
                 all.push(...t.players);
             });
         }
-        setAllplayers([...all.map((a: any) => [a.playerName, a.points])]);
+        setAllplayers([...all.map((a: any) => [a.playerName, a.point])]);
     }, [team]);
     useEffect(() => {
         async function getupcoming() {
@@ -69,21 +69,21 @@ export default function Stats({ matchdata, team, route }: { matchdata: any, team
         }
         getupcoming();
     }, [route.params.matchId]);
-
+    //console.log(team, 'teame');
     return (
         <View style={styles.container}>
             <Table borderStyle={{ borderWidth: 1 }}>
-                <Row data={tableHead} flexArr={[1, 1]} style={styles.head} textStyle={styles.text} />
+                <Row data={tableHead} flexArr={[1, 1]} style={styles.head} textStyle={styles.headerText} />
             </Table>
             <ScrollView style={styles.dataWrapper}>
-                <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                <Table borderStyle={{ borderWidth: 1, borderColor: '#212121' }}>
                     {
                         allPlayers.map((rowData, index) => (
                             <Row
                                 key={index}
                                 data={rowData}
                                 widthArr={widthArr}
-                                style={[styles.row, index % 2 && { backgroundColor: '#F7F6E7' }]}
+                                style={styles.row}
                                 textStyle={styles.text}
                             />
                         ))
@@ -282,11 +282,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginRight: 5
     },
-    head: { height: 40, backgroundColor: '#f1f8ff' },
+    head: { height: 40, backgroundColor: '#202020' },
     wrapper: { flexDirection: 'row' },
     title: { flex: 1, backgroundColor: '#f6f8fa' },
     row: { height: 28 },
     text: { textAlign: 'center' },
+    headerText: { textAlign: 'center', fontWeight: '400', color: "#FFF", textTransform: "capitalize" },
     header: { height: 50, backgroundColor: '#537791' },
     dataWrapper: { marginTop: -1 }
 });

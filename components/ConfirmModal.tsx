@@ -6,12 +6,12 @@ import { ListRenderItem } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
 import SvgUri from 'react-native-svg-uri';
-import axios from "axios";
 import { getDisplayDate } from '../utils/dateFormat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { loadToken, logout } from '../actions/userAction';
+import { API, loadToken, logout } from '../actions/userAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { URL } from '../constants/userConstants';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 
 
 export type RootStackParamList = {
@@ -43,14 +43,16 @@ export default function ConfirmModal({ open, setOpen, handleclose,
     teamid,
     id,
     loadjoined,
-    setSelectedTeam }: {
-        open: boolean, setOpen: any
+    setSelectedTeam,
+    Dialog }: {
+        open: boolean, setOpen: any,
         handleclose: any,
         modal: any,
         teamid: string,
         id: string
         loadjoined: any,
-        setSelectedTeam: any
+        setSelectedTeam: any,
+        Dialog: any
     }) {
     const { userToken, user } = useSelector((state: any) => state.user);
     const dispatch: any = useDispatch();
@@ -67,7 +69,7 @@ export default function ConfirmModal({ open, setOpen, handleclose,
     }, []);
     useEffect(() => {
         const i = setInterval(() => {
-            setDate(new Date());
+            // setDate(new Date());
         }, 1000);
         return () => {
             clearInterval(i);
@@ -75,25 +77,65 @@ export default function ConfirmModal({ open, setOpen, handleclose,
     }, []);
     const onPress = async () => {
         try {
-            const data = await axios.get(
-                `${URL}/joincontest/${modal._id}?userid=${user._id}&teamid=${teamid}`
+            const data = await API.get(
+                `${URL}/joincontest/${modal._id}?teamid=${teamid}`
             );
             loadjoined();
+            Toast.show({
+                type: ALERT_TYPE.SUCCESS,
+                title: 'Joined Contest Successfully',
+                textBody: 'Congrats! joined contest successfully',
+                autoClose: 100
+            });
             setSelectedTeam(null);
             setOpen(false);
-        } catch (e) {
+        } catch (error: any) {
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Cannot join contest',
+                textBody: 'Join contest failed',
+                autoClose: 500
+            })
+            setSelectedTeam(null);
             setOpen(false);
         }
     }
+    const close = () => {
+        setSelectedTeam(null);
+        setOpen(false);
+    }
+
     return (
         <View style={styles.container}>
             <Modal
                 animationType="slide"
                 transparent={true}
                 visible={open}
-
             >
                 <View style={styles.modal}>
+                    <View style={styles.modalTop}>
+                        <Text>Confirmation</Text>
+                        <View><Ionicons name='close' size={24} onPress={() => close()} /></View>
+                    </View>
+                    <View style={styles.modalTop}>
+                        <Text>Entry</Text>
+                        <Text>200</Text>
+                    </View>
+                    <View style={styles.modalTop}>
+                        <Text>Apply 25 coupon</Text>
+                        <Text>25%</Text>
+                    </View>
+                    <View style={styles.modalTop}>
+                        <Text>Usable cash bonus</Text>
+                        <Text>0</Text>
+                    </View>
+                    <View style={styles.modalTop}>
+                        <Text>To Pay</Text>
+                        <Text>{modal && (modal.price / modal.totalSpots)}</Text>
+                    </View>
+                    <Text style={styles.note}>
+                        By joining this contest, you accept Dream11 T&C's and confirm that you are not resident of Andhra Pradesh, Assam, Nagaland, Odisha, Sikkim or Telangana. I also agree to be contacted by Dream11 and their partners.
+                    </Text>
                     <Button
                         onPress={onPress}
                         title="Join Contest"
@@ -108,9 +150,12 @@ export default function ConfirmModal({ open, setOpen, handleclose,
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
         color: 'white',
-        padding: 10
+        padding: 10,
+        width: "100%",
+        // justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#FFFFFF"
     },
     match: {
         shadowColor: 'black',
@@ -164,6 +209,19 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 2,
     },
+    modalTop: {
+        backgroundColor: 'white',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexDirection: "row",
+        width: "100%",
+        paddingHorizontal: "5%",
+        marginTop: 5
+    },
+    note: {
+        marginVertical: 15,
+        textAlign: "center"
+    },
     matchTop: {
         borderBottomColor: '#DDDDDD',
         borderBottomWidth: 1,
@@ -187,11 +245,13 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     modal: {
-        width: 320,
+        width: "80%",
         marginTop: 50,
-        height: 200,
-        marginLeft: 20,
-        backgroundColor: "#FFFFF",
+        height: 300,
+        marginHorizontal: "10%",
+        justifyContent: 'center',
+        alignItems: "center",
+        backgroundColor: "#FFFFFF",
         shadowColor: 'black',
         shadowOffset: {
             width: 0,

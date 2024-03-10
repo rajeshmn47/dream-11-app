@@ -6,7 +6,7 @@ import { ListRenderItem } from 'react-native';
 import { RadioButton } from 'react-native-paper';
 import { getDisplayDate } from '../utils/dateFormat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { loadToken, logout } from '../actions/userAction';
+import { API, loadToken, logout } from '../actions/userAction';
 import { useDispatch } from 'react-redux';
 import { checkar, checkwk } from '../utils/playersFilter';
 import { getImageName } from '../utils/images';
@@ -118,36 +118,17 @@ const TeamItem = ({ data, date, match, selectedTeam, setSelectedTeam }: {
 );
 
 
-export default function SelectTeams({ teams, setSelectTeams, selectedTeam, date, match_details, setSelectedTeam }: {
+export default function SelectTeams({ teams, setSelectTeams, selectedTeam, date, match_details, matchlive, setSelectedTeam }: {
     teams: any[], setSelectTeams: any,
-    date: any, match_details: any, selectedTeam: any, setSelectedTeam: any
+    date: any, match_details: any, matchlive: any, selectedTeam: any, setSelectedTeam: any
 }) {
     const dispatch: any = useDispatch();
     const [text, setText] = useState('');
     const [upcoming, setUpcoming] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const renderTeamItem: ListRenderItem<Team> = ({ item }) => <TeamItem data={item} date={date} match={match_details}
+    const renderTeamItem: ListRenderItem<Team> = ({ item }) => <TeamItem data={item} date={date} match={matchlive || match_details}
         selectedTeam={selectedTeam} setSelectedTeam={setSelectedTeam} />;
-    useEffect(() => {
-        async function getupcoming() {
-            setLoading(true);
-            try {
-                const response = await fetch('https://backendforpuand-dream11.onrender.com/home');
-                const json: any = await response.json();
-                const a: [] = json.upcoming.results;
-                setUpcoming([...a])
-            } catch (error) {
-                console.error(error);
-            }
-            setLoading(false);
-        }
-        getupcoming();
-    }, []);
-    const onPress = () => {
-        dispatch(logout())
-        dispatch(loadToken())
-    }
     return (
         <View>
             <FlatList

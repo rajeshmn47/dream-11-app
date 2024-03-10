@@ -13,22 +13,21 @@ import {
     Keyboard,
     TouchableOpacity,
     KeyboardAvoidingView,
+    DevSettings,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { getAuth, signInWithPhoneNumber } from "firebase/auth";
 import { OtpInput } from "react-native-otp-entry";
-import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import Loader from '../loader/Loader';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from '../../App';
 import { URL } from '../../constants/userConstants';
+import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 const LoginScreen = ({ navigation }: Props) => {
     const recaptchaVerifier: any = React.useRef(null);
     const appVerifier = recaptchaVerifier.current;
-    const auth = getAuth();
     const [phoneNumber, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
     const [otpScreen, setOtpScreen]: any = useState(false);
@@ -73,7 +72,7 @@ const LoginScreen = ({ navigation }: Props) => {
                     //console.log(responseJson.data.email);
                 } else {
                     setErrortext(responseJson.msg);
-                    console.log('Please check your email id or password');
+                    console.log('Please check your email id or password', responseJson);
                 }
             })
             .catch((error) => {
@@ -101,16 +100,32 @@ const LoginScreen = ({ navigation }: Props) => {
                 },
             }).then((response) => response.json())
                 .then((responseJson) => {
+                    console.log(responseJson, 'json');
                     //Hide Loader
                     setLoading(false);
                     // If server response message same as Data Matched
                     if (responseJson.success === 'ok') {
-                        AsyncStorage.setItem('server_token', responseJson.token);
-                        // console.log(responseJson.data.email);
-                        navigation.navigate("Home")
+                        AsyncStorage.setItem('server_token', responseJson.token).then((value) => {
+                            DevSettings.reload()
+                        })
+                    }
+                    else {
+                        Toast.show({
+                            type: ALERT_TYPE.DANGER,
+                            title: 'Failure',
+                            textBody: responseJson.message,
+                            autoClose: 200
+                        })
                     }
                 }).catch((error: any) => {
                     console.error(error)
+                    console.log(error.response, 'err')
+                    Toast.show({
+                        type: ALERT_TYPE.DANGER,
+                        title: 'Failure',
+                        textBody: error.response.data.message,
+                        autoClose: 200
+                    })
                     // Error; SMS not sent
                     // ...
                 });
@@ -120,88 +135,88 @@ const LoginScreen = ({ navigation }: Props) => {
     }
 
     return (
-        <View style={styles.mainBody}>
-            <Loader loading={loading} />
-            <ScrollView
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignContent: 'center',
-                }}>
-                <View>
-                    {otpScreen ? <KeyboardAvoidingView enabled>
-                        <View style={styles.SectionStyle}>
-                            <OtpInput numberOfDigits={6} onTextChange={(text) => setOtp(text)}
-                                theme={{
-                                    containerStyle: styles.otpContainer,
-                                    inputsContainerStyle: styles.otpInputsContainer,
-                                    pinCodeContainerStyle: styles.otpPinCodeContainer,
-                                    pinCodeTextStyle: styles.otpPinCodeText,
-                                    focusStickStyle: styles.focusStick,
-                                    focusedPinCodeContainerStyle: styles.activePinCodeContainer
-                                }} />
-                        </View>
-                        {errortext != '' ? (
-                            <Text style={styles.errorTextStyle}>
-                                {errortext}
-                            </Text>
-                        ) : null}
-                        <Text
-                            style={styles.registerTextStyle}
-                            onPress={() => navigation.navigate('Register')}>
-                            New Here ? Register
-                        </Text>
-                    </KeyboardAvoidingView> :
-                        <KeyboardAvoidingView enabled>
+        <AlertNotificationRoot>
+            <View style={styles.mainBody}>
+                <Loader loading={loading} />
+                <ScrollView
+                    keyboardShouldPersistTaps="handled"
+                    keyboardDismissMode={'on-drag'}
+                    contentContainerStyle={{
+                        justifyContent: 'center',
+                        alignContent: 'center',
+                    }}>
+                    <View>
+                        {otpScreen ? <KeyboardAvoidingView enabled>
                             <View style={styles.SectionStyle}>
-                                <TextInput
-                                    style={styles.inputStyle}
-                                    onChangeText={(phone) =>
-                                        setPhoneNumber(phone)
-                                    }
-                                    placeholder="Enter Phone Number" //12345
-                                    placeholderTextColor="#8b9cb5"
-                                    keyboardType="default"
-                                    ref={passwordInputRef}
-                                    onSubmitEditing={Keyboard.dismiss}
-                                    blurOnSubmit={false}
-                                    secureTextEntry={false}
-                                    underlineColorAndroid="#f000"
-                                    returnKeyType="next"
-                                />
+                                <OtpInput numberOfDigits={6} onTextChange={(text) => setOtp(text)}
+                                    theme={{
+                                        containerStyle: styles.otpContainer,
+                                        inputsContainerStyle: styles.otpInputsContainer,
+                                        pinCodeContainerStyle: styles.otpPinCodeContainer,
+                                        pinCodeTextStyle: styles.otpPinCodeText,
+                                        focusStickStyle: styles.focusStick,
+                                        focusedPinCodeContainerStyle: styles.activePinCodeContainer
+                                    }} />
                             </View>
                             {errortext != '' ? (
                                 <Text style={styles.errorTextStyle}>
                                     {errortext}
                                 </Text>
                             ) : null}
-                            <TouchableOpacity
-                                style={styles.buttonStyle}
-                                activeOpacity={0.5}
-                                onPress={handleSubmitPress}>
-                                <Text style={styles.buttonTextStyle}>Next</Text>
-                            </TouchableOpacity>
                             <Text
                                 style={styles.registerTextStyle}
                                 onPress={() => navigation.navigate('Register')}>
                                 New Here ? Register
                             </Text>
-                        </KeyboardAvoidingView>
-                    }
-                </View>
-            </ScrollView>
-        </View>
+                        </KeyboardAvoidingView> :
+                            <KeyboardAvoidingView enabled>
+                                <View style={styles.SectionStyle}>
+                                    <TextInput
+                                        style={styles.inputStyle}
+                                        onChangeText={(phone) =>
+                                            setPhoneNumber(phone)
+                                        }
+                                        placeholder="Enter Phone Number" //12345
+                                        placeholderTextColor="#8b9cb5"
+                                        keyboardType="default"
+                                        ref={passwordInputRef}
+                                        onSubmitEditing={Keyboard.dismiss}
+                                        blurOnSubmit={false}
+                                        secureTextEntry={false}
+                                        underlineColorAndroid="#f000"
+                                        returnKeyType="next"
+                                    />
+                                </View>
+                                {errortext != '' ? (
+                                    <Text style={styles.errorTextStyle}>
+                                        {errortext}
+                                    </Text>
+                                ) : null}
+                                <TouchableOpacity
+                                    style={styles.buttonStyle}
+                                    activeOpacity={0.5}
+                                    onPress={handleSubmitPress}>
+                                    <Text style={styles.buttonTextStyle}>Next</Text>
+                                </TouchableOpacity>
+                                <Text
+                                    style={styles.registerTextStyle}
+                                    onPress={() => navigation.navigate('Register')}>
+                                    New Here ? Register
+                                </Text>
+                            </KeyboardAvoidingView>
+                        }
+                    </View>
+                </ScrollView>
+            </View>
+        </AlertNotificationRoot>
     );
 };
 export default LoginScreen;
 
 const styles = StyleSheet.create({
     mainBody: {
-        flex: 1,
         justifyContent: 'center',
-        backgroundColor: '#ffffff',
-        alignContent: 'center',
+        alignContent: 'center'
     },
     SectionStyle: {
         flexDirection: 'row',

@@ -13,3 +13,5 @@ declare module 'react-native-vector-icons/Octicons';
 declare module 'react-native-vector-icons/MaterialIcons';
 declare module 'react-native-vector-icons/FontAwesome5';
 declare module 'react-native-vector-icons/FontAwesome6';
+declare module 'fiction-expo-restart';
+declare module 'react-native-razorpay';

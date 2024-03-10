@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 const { width } = Dimensions.get("window");
 const { height } = Dimensions.get("window");
 
-export default function Navbar() {
+export default function Navbar({ navigation }: { navigation: any }) {
     const { isAuthenticated, user } = useSelector((state: any) => state.user);
     const [open, setOpen] = useState<boolean>(false);
     const width = Dimensions.get('window').width;
@@ -21,7 +21,7 @@ export default function Navbar() {
                         <Icon name="menu" color="#fff" size={20} />
                     </View>
                 </TouchableOpacity>
-                <Text style={styles.textColor}>Powerplay{user?.username}</Text>
+                <Text style={styles.textColor}>Powerplay11</Text>
             </View>
             <View style={styles.rightContainer}>
                 <View style={{ marginRight: 10 }}>
@@ -43,7 +43,7 @@ export default function Navbar() {
                 style={styles.sideMenuStyle}
             >
                 <Text>rajesh</Text>
-                <SideMenu />
+                <SideMenu navigation={navigation} user={user}/>
                 <Button title="close" onPress={() => setOpen(false)} />
             </Modal>
         </View>
@@ -53,7 +53,7 @@ export default function Navbar() {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: height/33,
+        //marginTop: height / 33,
         backgroundColor: 'black',
         color: 'white',
         height: "10%",

@@ -19,11 +19,9 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { getAuth, signInWithPhoneNumber } from "firebase/auth";
 import { OtpInput } from "react-native-otp-entry";
-import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import Loader from '../loader/Loader';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from './../../App';
 import { URL } from '../../constants/userConstants';
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Entry">;
@@ -31,7 +29,6 @@ const w = Dimensions.get('window').width;
 const EntryScreen = ({ navigation }: Props) => {
     const recaptchaVerifier: any = React.useRef(null);
     const appVerifier = recaptchaVerifier.current;
-    const auth = getAuth();
     const [phoneNumber, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
     const [otpScreen, setOtpScreen]: any = useState(false);
@@ -57,8 +54,7 @@ const EntryScreen = ({ navigation }: Props) => {
         setLoading(true);
         let dataToSend: any = { phoneNumber: phoneNumber };
         let formBody: any = [];
-        console.log(dataToSend, 'formbody')
-        fetch(`http://192.168.202.175:9000/auth/phoneLogin`, {
+        fetch(`${URL}/auth/phoneLogin`, {
             method: 'POST',
             body: JSON.stringify(dataToSend),
             headers: {
@@ -70,7 +66,6 @@ const EntryScreen = ({ navigation }: Props) => {
             .then((responseJson) => {
                 //Hide Loader
                 setLoading(false);
-                console.log(responseJson);
                 // If server response message same as Data Matched
                 if (responseJson.success === 'ok') {
                     setOtpScreen(true)
@@ -97,7 +92,7 @@ const EntryScreen = ({ navigation }: Props) => {
         else {
             setLoading(true);
             let dataToSend: any = { otp: otp, phoneNumber: phoneNumber };
-            fetch(`http://192.168.202.175:9000/auth/verifyPhoneOtp`, {
+            fetch(`${URL}/auth/verifyPhoneOtp`, {
                 method: 'POST',
                 body: JSON.stringify(dataToSend),
                 headers: {
@@ -108,7 +103,6 @@ const EntryScreen = ({ navigation }: Props) => {
                 .then((responseJson) => {
                     //Hide Loader
                     setLoading(false);
-                    console.log(responseJson);
                     // If server response message same as Data Matched
                     if (responseJson.success === 'ok') {
                         AsyncStorage.setItem('server_token', responseJson.token);
