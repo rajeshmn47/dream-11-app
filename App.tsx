@@ -60,7 +60,8 @@ export type RootStackParamList = {
   Withdraw: undefined,
   View: { match: any, team: any, data: any },
   Bank: undefined,
-  UserProfile: undefined
+  UserProfile: undefined,
+  Kyc: undefined
 };
 
 export default function App() {

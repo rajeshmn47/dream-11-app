@@ -1,11 +1,10 @@
-import { Button, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, Dimensions, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal"
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SideMenu from "./SideMenu";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-
 const { width } = Dimensions.get("window");
 const { height } = Dimensions.get("window");
 
@@ -33,6 +32,7 @@ export default function Navbar({ navigation }: { navigation: any }) {
             </View>
             <Modal
                 isVisible={open}
+                onBackdropPress={() => setOpen(false)}
                 // Android back press // Swipe to discard
                 animationIn="slideInLeft" // Has others, we want slide in from the left
                 animationOut="slideOutLeft" // When discarding the drawer
@@ -42,9 +42,8 @@ export default function Navbar({ navigation }: { navigation: any }) {
                 propagateSwipe // Allows swipe events to propagate to children components (eg a ScrollView inside a modal) // Needs to contain the width, 75% of screen width in our case
                 style={styles.sideMenuStyle}
             >
-                <Text>rajesh</Text>
-                <SideMenu navigation={navigation} user={user}/>
-                <Button title="close" onPress={() => setOpen(false)} />
+                <SideMenu navigation={navigation} user={user} />
+                {/*<Button title="close" onPress={() => setOpen(false)} />*/}
             </Modal>
         </View>
 

@@ -9,7 +9,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Slider } from '@miblanchard/react-native-slider';
 import SvgUri from 'react-native-svg-uri';
 import { getDisplayDate } from '../utils/dateFormat';
-import { RootStackParamList } from './HomeScreen';
+import { RootStackParamList } from './../App';
 import { getmatch } from "../actions/matchAction";
 import { getDatabase, onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";

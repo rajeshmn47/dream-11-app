@@ -39,6 +39,7 @@ import EditTeam from '../EditTeam';
 import Withdraw from '../Withdraw';
 import UserBankAccount from '../UserBankAccount';
 import UserProfile from '../UserProfile';
+import KYC from '../sidebar/KYC';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -93,6 +94,7 @@ export default function MyStackNavigator() {
                         <Stack.Screen name="HowToPlay" component={HowToPlay} options={{ headerShown: false }} />
                         <Stack.Screen name="TermsandConditions" component={TermsandConditions} options={{ headerShown: false }} />
                         <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
+                        <Stack.Screen name="Kyc" component={KYC} options={{ headerShown: true }} />
                     </Stack.Navigator>
                 </NavigationContainer>
             )}

@@ -7,6 +7,7 @@ import IonicIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { loadToken, logout } from "../../actions/userAction";
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
 
 const styles = StyleSheet.create({
     safeAreaView: {
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#000000",
         padding: 2,
         paddingLeft: 20,
-        paddingBottom: 10
+        paddingVertical: 20
     },
     title: {
         marginTop: 15,
@@ -67,10 +68,11 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         flexDirection: 'row',
-        marginTop: 20,
-        marginLeft: 15,
-        padding: 4,
-        fontSize: 16
+        paddingLeft: 20,
+        paddingVertical: 15,
+        fontSize: 16,
+        borderColor: "#CCC",
+        borderBottomWidth: 1
     },
     icon: {
         marginRight: 15
@@ -130,6 +132,12 @@ class SideMenu extends React.Component {
                             <Text style={styles.text}>How to play</Text>
                         </View>
                     </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Kyc")}>
+                        <View style={styles.sidebarItem}>
+                            <AntDesign name="idcard" size={24} color="black" style={styles.icon} />
+                            <Text style={styles.text}>KYC</Text>
+                        </View>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("TermsandConditions")}>
                         <View style={styles.sidebarItem}>
                             <IonicIcon name="account-group-outline" style={styles.icon} size={20} />
@@ -142,12 +150,12 @@ class SideMenu extends React.Component {
                             <Text style={styles.text}>Help & Support</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.onPress()}>
+                    {/*<TouchableOpacity onPress={() => this.onPress()}>
                         <View style={styles.sidebarItem}>
                             <IonicIcon name="logout" style={styles.icon} size={20} />
                             <Text style={styles.text}>Logout</Text>
                         </View>
-                    </TouchableOpacity>
+                    </TouchableOpacity>*/}
                 </View>
                 <View style={styles.footer}>
                     <Text onPress={this.callParentScreenFunction} style={styles.link}>

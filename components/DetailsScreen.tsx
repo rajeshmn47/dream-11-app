@@ -118,7 +118,7 @@ export default function DetailsScreen({ navigation, route }: Props) {
     });
     const [open, setOpen] = useState<boolean>(false);
     const [teamOpen, setTeamOpen] = useState<boolean>(false);
-    const [modal, setModal] = React.useState(null);
+    const [modal, setModal] = React.useState<any>(null);
     const [index, setIndex] = React.useState(0);
     const [routes, setRoutes] = React.useState([
         { key: 'contests', title: 'All Contests' },
@@ -210,7 +210,7 @@ export default function DetailsScreen({ navigation, route }: Props) {
     //       clearInterval(i);
     //   };
     //}, []);
-
+    console.log(myContests.find((c: any) => c.contest?._id == modal?._id)?.teams?.map((t: any) => t?._id),'teamids');
     const FirstRoute = () => (
         <View style={{ flex: 1, backgroundColor: '#ffffff' }} >
             <View>
@@ -424,8 +424,18 @@ export default function DetailsScreen({ navigation, route }: Props) {
                             navigation={navigation}
                         />
                     </> :
-                    <SelectTeams teams={teams} setSelectTeams={setSelectTeams} date={date} match_details={match_details} matchlive={matchlive} selectedTeam={selectedTeam}
-                        setSelectedTeam={setSelectedTeam} />
+                    <>
+                    <SelectTeams handlePress={handlePress} teams={teams} setSelectTeams={setSelectTeams} date={date} match_details={match_details} matchlive={matchlive} selectedTeam={selectedTeam}
+                        setSelectedTeam={setSelectedTeam} teamIds={myContests?.length>0?[...myContests.find((c: any) => c?.contest?._id == modal?._id)?.teams?.map((t: any) => t?._id)]:[]} />
+                        <TouchableHighlight onPress={handlePress}>
+                        <View style={styles.create}>
+                            <AntIcon name="pluscircleo" size={20} color="#ffffff" style={styles.icon} />
+                            <Text style={styles.bright}>
+                                Create Team
+                            </Text>
+                        </View>
+                    </TouchableHighlight>
+                    </>
                 }
             </View>
         </AlertNotificationRoot>

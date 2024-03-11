@@ -1,15 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, StyleSheet } from 'react-native';
+import { Button, ScrollView, StyleSheet, TouchableHighlight } from 'react-native';
 import { Text, FlatList, TextInput, View, Image, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { ListRenderItem } from 'react-native';
 import { RadioButton } from 'react-native-paper';
+import AntIcon from 'react-native-vector-icons/AntDesign';
 import { getDisplayDate } from '../utils/dateFormat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { API, loadToken, logout } from '../actions/userAction';
 import { useDispatch } from 'react-redux';
 import { checkar, checkwk } from '../utils/playersFilter';
 import { getImageName } from '../utils/images';
+import { styles as newStyles } from './detailscreen/stylesheet';
 
 
 export type RootStackParamList = {
@@ -46,13 +48,13 @@ export interface Team {
     viceCaptainId: string;
 }
 
-const TeamItem = ({ data, date, match, selectedTeam, setSelectedTeam }: {
+const TeamItem = ({ teamIds, data, date, match, selectedTeam, setSelectedTeam, handlePress }: {
     data: Team, date: any, match: any, selectedTeam: any,
-    setSelectedTeam: any
+    setSelectedTeam: any, teamIds: any, handlePress: any
 }) =>
-(
-    <View style={styles.container}>
-        <View style={styles.wholeTeamContainer}>
+(<>
+    {teamIds?.find((id: any) => id.toString() == data?._id.toString()) ? <View style={styles.disabledContainer}>
+        <View style={styles.disabledTeamContainer}>
             <View style={styles.teamTop}>
                 <View style={styles.teamInfo}>
                     <Text style={styles.bright}>
@@ -105,6 +107,68 @@ const TeamItem = ({ data, date, match, selectedTeam, setSelectedTeam }: {
             </View>
 
         </View>
+        <View style={styles.input} pointerEvents={'none'}>
+            <RadioButton.Android
+                value={data?._id}
+                status={data._id === selectedTeam?._id ?
+                    'checked' : 'unchecked'}
+                onPress={() => setSelectedTeam(data)}
+                color="#3d7248"
+            />
+        </View>
+    </View> : <View style={styles.container}>
+        <View style={styles.wholeTeamContainer}>
+            <View style={styles.teamTop}>
+                <View style={styles.teamInfo}>
+                    <Text style={styles.bright}>
+                        {match.teamHomeCode}
+                    </Text>
+                    <Text style={styles.bright} >
+                        {
+                            match.teamHomePlayers.filter((f: any) =>
+                                data.players.some((s: any) => f.playerId == s.playerId)
+                            ).length
+                        }
+                    </Text>
+                </View>
+                <View style={styles.teamInfo}>
+                    <Text style={styles.bright}>
+                        {match.teamAwayCode}
+                    </Text>
+                    <Text style={styles.bright}>
+                        {
+                            match.teamAwayPlayers.filter((f: any) =>
+                                data.players.some((s: any) => f.playerId == s.playerId)
+                            ).length
+                        }
+                    </Text>
+                </View>
+                <View style={styles.teamInfo}>
+                    <Image source={{ uri: getImageName(data.captainId, match) }} style={{ width: 55, height: 55 }} />
+                </View>
+                <View style={styles.teamInfo}>
+                    <Image source={{ uri: getImageName(data.viceCaptainId, match) }} style={{ width: 55, height: 55 }} />
+                </View>
+            </View>
+            <View style={styles.info}>
+                <View style={styles.singleInfo}>
+                    <Text style={styles.light}>WK </Text>
+                    <Text>{data.players.filter((p) => checkwk(p.position)).length}</Text>
+                </View>
+                <View style={styles.singleInfo}>
+                    <Text style={styles.light}>BAT </Text>
+                    <Text>{data.players.filter((p) => p.position == "batsman").length}</Text>
+                </View>
+                <View style={styles.singleInfo}>
+                    <Text style={styles.light}>AR </Text>
+                    <Text>{data.players.filter((p) => checkar(p.position)).length}</Text>
+                </View>
+                <View style={styles.singleInfo}>
+                    <Text style={styles.light}>BOWL </Text>
+                    <Text>{data.players.filter((p) => p.position == "bowler").length}</Text>
+                </View>
+            </View>
+        </View>
         <View style={styles.input}>
             <RadioButton.Android
                 value={data?._id}
@@ -114,21 +178,18 @@ const TeamItem = ({ data, date, match, selectedTeam, setSelectedTeam }: {
                 color="#3d7248"
             />
         </View>
-    </View>
+    </View>}
+</>
 );
 
 
-export default function SelectTeams({ teams, setSelectTeams, selectedTeam, date, match_details, matchlive, setSelectedTeam }: {
-    teams: any[], setSelectTeams: any,
+export default function SelectTeams({ handlePress, teams, setSelectTeams, selectedTeam, date, match_details, matchlive, setSelectedTeam, teamIds }: {
+    teams: any[], setSelectTeams: any, teamIds: any, handlePress: any,
     date: any, match_details: any, matchlive: any, selectedTeam: any, setSelectedTeam: any
 }) {
-    const dispatch: any = useDispatch();
-    const [text, setText] = useState('');
-    const [upcoming, setUpcoming] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    const renderTeamItem: ListRenderItem<Team> = ({ item }) => <TeamItem data={item} date={date} match={matchlive || match_details}
-        selectedTeam={selectedTeam} setSelectedTeam={setSelectedTeam} />;
+    console.log(teamIds?.find((id: any) => teams?.find((t) => t._id == id)._id == id), 'teamidseee')
+    const renderTeamItem: ListRenderItem<Team> = ({ item }) => <TeamItem teamIds={teamIds} data={item} date={date} match={matchlive || match_details}
+        selectedTeam={selectedTeam} setSelectedTeam={setSelectedTeam} handlePress={handlePress} />;
     return (
         <View>
             <FlatList
@@ -142,12 +203,21 @@ export default function SelectTeams({ teams, setSelectTeams, selectedTeam, date,
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: '#FFF',
         color: 'white',
         padding: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row'
+    },
+    disabledContainer: {
+        backgroundColor: '#FFF',
+        color: 'white',
+        padding: 10,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        opacity: 0.5
     },
     match: {
         shadowColor: 'black',
@@ -238,7 +308,27 @@ const styles = StyleSheet.create({
         height: 150,
         justifyContent: 'space-between',
         flexDirection: 'column',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: "black"
+    },
+    disabledTeamContainer: {
+        flex: 9,
+        shadowColor: 'black',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 14,
+        margin: 15,
+        borderRadius: 10,
+        height: 150,
+        justifyContent: 'space-between',
+        flexDirection: 'column',
+        alignItems: 'center',
+        backgroundColor: "yellow",
+        opacity: 0.5
     },
     date: {
         fontSize: 10

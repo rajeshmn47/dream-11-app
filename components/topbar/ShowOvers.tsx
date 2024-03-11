@@ -9,7 +9,7 @@ import { Slider } from '@miblanchard/react-native-slider';
 import SvgUri from 'react-native-svg-uri';
 import axios from "axios";
 import { getDisplayDate } from '../../utils/dateFormat';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from '../../App';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
