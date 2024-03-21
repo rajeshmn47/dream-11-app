@@ -7,7 +7,6 @@ import { RadioButton } from 'react-native-paper';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import { getDisplayDate } from '../utils/dateFormat';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { API, loadToken, logout } from '../actions/userAction';
 import { useDispatch } from 'react-redux';
 import { checkar, checkwk } from '../utils/playersFilter';
@@ -47,21 +46,19 @@ export interface Team {
     players: any[];
     captainId: string;
     viceCaptainId: string;
-    teamId: any;
 }
 
 const TeamItem = ({ teamIds, data, date, match, selectedTeam, setSelectedTeam }: {
-    data: Team, date: any, match: any, selectedTeam: any,
+    data: any, date: any, match: any, selectedTeam: any,
     setSelectedTeam: any, teamIds: any
 }) =>
 (<>
     {teamIds?.find((id: any) => id?.toString() == data?._id.toString()) ? <View style={styles.disabledContainer}>
         <View style={styles.disabledTeamContainer}>
             <View style={styles.id}>
-                <Text style={styles.bright}>TEAM {data?.teamId}</Text>
+                <Text style={styles.bright}>{data?.teamId}</Text>
             </View>
             <View style={styles.teamTop}>
-
                 <View style={styles.teamInfo}>
                     <Text style={styles.bright}>
                         {match.teamHomeCode}
@@ -96,19 +93,19 @@ const TeamItem = ({ teamIds, data, date, match, selectedTeam, setSelectedTeam }:
             <View style={styles.info}>
                 <View style={styles.singleInfo}>
                     <Text style={styles.light}>WK </Text>
-                    <Text>{data.players.filter((p) => checkwk(p.position)).length}</Text>
+                    <Text>{data.players.filter((p: any) => checkwk(p.position)).length}</Text>
                 </View>
                 <View style={styles.singleInfo}>
                     <Text style={styles.light}>BAT </Text>
-                    <Text>{data.players.filter((p) => p.position == "batsman").length}</Text>
+                    <Text>{data.players.filter((p: any) => p.position == "batsman").length}</Text>
                 </View>
                 <View style={styles.singleInfo}>
                     <Text style={styles.light}>AR </Text>
-                    <Text>{data.players.filter((p) => checkar(p.position)).length}</Text>
+                    <Text>{data.players.filter((p: any) => checkar(p.position)).length}</Text>
                 </View>
                 <View style={styles.singleInfo}>
                     <Text style={styles.light}>BOWL </Text>
-                    <Text>{data.players.filter((p) => p.position == "bowler").length}</Text>
+                    <Text>{data.players.filter((p: any) => p.position == "bowler").length}</Text>
                 </View>
             </View>
 
@@ -161,19 +158,19 @@ const TeamItem = ({ teamIds, data, date, match, selectedTeam, setSelectedTeam }:
             <View style={styles.info}>
                 <View style={styles.singleInfo}>
                     <Text style={styles.light}>WK </Text>
-                    <Text>{data.players.filter((p) => checkwk(p.position)).length}</Text>
+                    <Text>{data.players.filter((p: any) => checkwk(p.position)).length}</Text>
                 </View>
                 <View style={styles.singleInfo}>
                     <Text style={styles.light}>BAT </Text>
-                    <Text>{data.players.filter((p) => p.position == "batsman").length}</Text>
+                    <Text>{data.players.filter((p: any) => p.position == "batsman").length}</Text>
                 </View>
                 <View style={styles.singleInfo}>
                     <Text style={styles.light}>AR </Text>
-                    <Text>{data.players.filter((p) => checkar(p.position)).length}</Text>
+                    <Text>{data.players.filter((p: any) => checkar(p.position)).length}</Text>
                 </View>
                 <View style={styles.singleInfo}>
                     <Text style={styles.light}>BOWL </Text>
-                    <Text>{data.players.filter((p) => p.position == "bowler").length}</Text>
+                    <Text>{data.players.filter((p: any) => p.position == "bowler").length}</Text>
                 </View>
             </View>
         </View>
@@ -191,20 +188,15 @@ const TeamItem = ({ teamIds, data, date, match, selectedTeam, setSelectedTeam }:
 );
 
 
-export default function SelectTeams({ teams, setSelectTeams, selectedTeam, date, match_details, matchlive, setSelectedTeam, teamIds }: {
-    teams: any[], setSelectTeams: any, teamIds: any,
+export default function Swap({ teams, switchTeam, setSelectTeams, selectedTeam, date, match_details, matchlive, setSelectedTeam, teamIds }: {
+    teams: any[], switchTeam: any, setSelectTeams: any, teamIds: any,
     date: any, match_details: any, matchlive: any, selectedTeam: any, setSelectedTeam: any
 }) {
-    console.log(teams, 'teamidseee')
     const renderTeamItem: ListRenderItem<Team> = ({ item }) => <TeamItem teamIds={teamIds} data={item} date={date} match={matchlive || match_details}
         selectedTeam={selectedTeam} setSelectedTeam={setSelectedTeam} />;
     return (
         <View>
-            <TouchableHighlight onPress={() => setSelectTeams({ team: null, selected: false })}>
-                <View style={styles.closeIcon}>
-                    <Ionicons name='close' size={24} color="#55d441" />
-                </View>
-            </TouchableHighlight>
+            <Text style={styles.swapTeam}>Choose team to switch with TEAM {switchTeam?.teamId}</Text>
             <FlatList
                 data={teams}
                 renderItem={renderTeamItem}
@@ -400,11 +392,6 @@ const styles = StyleSheet.create({
     input: {
         flex: 1
     },
-    closeIcon: {
-        justifyContent: "flex-end",
-        flexDirection: "row",
-        marginRight: 25
-    },
     swapTeam: {
         textAlign: "center",
         textTransform: "uppercase"
@@ -413,9 +400,5 @@ const styles = StyleSheet.create({
         backgroundColor: "#25551e",
         width: "100%",
         padding: 5
-    },
-    brightText: {
-        color: '#FFFFFF',
-        textTransform: 'uppercase'
     }
 });

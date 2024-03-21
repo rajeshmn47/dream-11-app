@@ -79,7 +79,7 @@ export function MyContestItem({ data, match, matchLive, navigation }: { data: My
                                 {((matchLive?.result) == "In Progress" && t.won > 0) ? <Text style={styles.winText}>in Winning zone</Text> : null}
                             </View>
                             <Text style={styles.bottomText}>
-                                T{t.teamnumber}
+                                T{t.teamId}
                             </Text>
                             <Text style={styles.bottomText}>
                                 {t.points}

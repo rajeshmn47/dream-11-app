@@ -142,7 +142,9 @@ export default function DetailsScreen({ navigation, route }: Props) {
             setContests(data.data.contests);
             const joinedC = await API.get(`${URL}/getjoinedcontest/${route.params.matchId}`);
             setRefreshing(false);
-            setMyContests([...joinedC.data.contests]);
+            if (joinedC.data.contests.length > 0) {
+                setMyContests([...joinedC.data.contests]);
+            }
         }
         getMatch();
     }, [route.params.matchId]);
@@ -164,6 +166,7 @@ export default function DetailsScreen({ navigation, route }: Props) {
                                 setCommentary([...doc.data().commentary?.reverse()]);
                             }
                             if (doc?.data()?.miniscore) {
+                                console.log(doc?.data()?.miniscore, 'checklivescore');
                                 setLivescore({ ...doc?.data()?.miniscore });
                             }
                         }
@@ -196,7 +199,9 @@ export default function DetailsScreen({ navigation, route }: Props) {
                 const data = await API.get(
                     `${URL}/getteam/?matchId=${route.params.matchId}`
                 );
-                setTeams(data.data.team);
+                if (data?.data?.team?.length > 0) {
+                    setTeams(data.data.team);
+                }
             }
             getTeams();
         }, [route.params.matchId])
@@ -210,7 +215,6 @@ export default function DetailsScreen({ navigation, route }: Props) {
     //       clearInterval(i);
     //   };
     //}, []);
-    console.log(myContests.find((c: any) => c.contest?._id == modal?._id)?.teams?.map((t: any) => t?._id),'teamids');
     const FirstRoute = () => (
         <View style={{ flex: 1, backgroundColor: '#ffffff' }} >
             <View>
@@ -425,16 +429,17 @@ export default function DetailsScreen({ navigation, route }: Props) {
                         />
                     </> :
                     <>
-                    <SelectTeams handlePress={handlePress} teams={teams} setSelectTeams={setSelectTeams} date={date} match_details={match_details} matchlive={matchlive} selectedTeam={selectedTeam}
-                        setSelectedTeam={setSelectedTeam} teamIds={myContests?.length>0?[...myContests.find((c: any) => c?.contest?._id == modal?._id)?.teams?.map((t: any) => t?._id)]:[]} />
+                        <SelectTeams teams={teams} setSelectTeams={setSelectTeams} date={date} match_details={match_details} matchlive={matchlive} selectedTeam={selectedTeam}
+                            setSelectedTeam={setSelectedTeam} teamIds={myContests.find((c: any) => c?.contest?._id == modal?._id)?.teams?.map((t: any) => t?._id).length > 0 && myContests?.length > 0 ? [...myContests.find((c: any) => c?.contest?._id == modal?._id)?.teams?.map((t: any) => t?._id)] : ['id']} />
+                        {/*teamIds={myContests?.length>0?[...myContests.find((c: any) => c?.contest?._id == modal?._id)?.teams?.map((t: any) => t?._id)]:['id']}*/}
                         <TouchableHighlight onPress={handlePress}>
-                        <View style={styles.create}>
-                            <AntIcon name="pluscircleo" size={20} color="#ffffff" style={styles.icon} />
-                            <Text style={styles.bright}>
-                                Create Team
-                            </Text>
-                        </View>
-                    </TouchableHighlight>
+                            <View style={styles.create}>
+                                <AntIcon name="pluscircleo" size={20} color="#ffffff" style={styles.icon} />
+                                <Text style={styles.bright}>
+                                    Create Team
+                                </Text>
+                            </View>
+                        </TouchableHighlight>
                     </>
                 }
             </View>

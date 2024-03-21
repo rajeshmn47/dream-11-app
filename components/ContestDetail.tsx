@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, StyleSheet, TouchableHighlight, TurboModuleRegistry } from 'react-native';
+import { Button, Dimensions, ScrollView, StyleSheet, TouchableHighlight, TurboModuleRegistry } from 'react-native';
 import { Text, FlatList, TextInput, View, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { ListRenderItem } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AntDesign } from '@expo/vector-icons';
 import { Slider } from '@miblanchard/react-native-slider';
 import SvgUri from 'react-native-svg-uri';
 import { getDisplayDate } from '../utils/dateFormat';
@@ -41,6 +42,10 @@ import ConfirmModal from './ConfirmModal';
 import Scorecard from './Scorecard';
 import Stats from './Stats';
 import { API } from '../actions/userAction';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import ViewTeam from './ViewTeam';
+import Swap from './Swap';
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
 
 export interface Contest {
@@ -81,22 +86,15 @@ export interface Commentary {
 
 
 
-
+const { width } = Dimensions.get("window")
 
 export type Props = NativeStackScreenProps<RootStackParamList, "ConDetail">;
 export default function ContestDetail({ navigation, route }: Props) {
     const dispatch = useDispatch();
     const { userToken, user } = useSelector((state: any) => state.user);
+    const { match_details, matchlive } = useSelector((state: any) => state.match);
     //const { match_details, matchlive } = useSelector((state: any) => state.match);
-    const [match, setMatch] = useState<any>(null)
-    const [text, setText] = useState('');
-    const [upcoming, setUpcoming] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [date, setDate] = useState<Date>(new Date());
-    const [commentary, setCommentary] = useState<any>();
-    const [livescore, setLivescore] = useState<any>();
-    const [contests, setContests] = useState<any[]>([]);
-    const [contestDetail, setContestDetail] = useState<any>(null);
     const [myContest, setMyContest] = useState<any>(null);
     const [prizes, setPrizes] = useState<any[]>([]);
     const layout = useWindowDimensions();
@@ -113,42 +111,26 @@ export default function ContestDetail({ navigation, route }: Props) {
     const [lTableHead, setLTableHead] = useState<any[]>(['All Teams', 'Points', 'Rank']);
     const [tableTitle, setTableTitle] = useState(['playerName', 'points', 'c']);
     const [widthArr, setWidthArr] = useState<any[]>([layout.width / 2, layout.width / 2]);
-    const [lWidthArr, setLWidthArr] = useState<any[]>([layout.width / 3, layout.width / 3, layout.width / 3])
-    const [tableData, setTableData] = useState([
-        ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
-        ['a', 'b', 'c', '1', '2', '3', '1', '2', '3'],
-        ['1', '2', '3', '1', '2', '3', '1', '2', '3'],
-        ['a', 'b', 'c', '1', '2', '3', '1', '2', '3']
-    ])
-
-    useEffect(() => {
-        if (selectTeams.team) {
-            setOpen(true);
-        }
-    }, [selectTeams]);
-    useEffect(() => {
-        setSelectTeams({
-            open: false,
-            team: selectedTeam,
-        });
-    }, [selectedTeam]);
-
-
+    const [lWidthArr, setLWidthArr] = useState<any[]>([layout.width])
+    const [showTeam, setShowTeam] = useState<any>(null);
+    const [switchTeam, setSwitchTeam] = useState<any>(null);
+    const [teamOpen, setTeamOpen] = useState<boolean>(false);
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
         { key: 'winnings', title: 'Winnings' },
         { key: 'leaderboard', title: 'Leaderboard' },
     ]);
-    const handleClick = (contest: any) => {
-        setSelectTeams({ selected: true, team: null })
-        setModal(contest)
-    }
+
     useEffect(() => {
         async function getContest() {
-            //setMyContest(route.params.contest);
+            const { data } = await API.get(
+                `${URL}/getteam/?matchId=${route.params.matchId}`
+            );
+            setTeams([...data?.team]);
+            dispatch<any>(getmatch(route.params.matchId));
         }
         getContest();
-    }, [route.params.contest]);
+    }, [route.params.matchId]);
 
     useEffect(() => {
         async function getteams() {
@@ -156,13 +138,24 @@ export default function ContestDetail({ navigation, route }: Props) {
                 const teamdata = await API.get(`${URL}/getteamsofcontest/${route.params.contestId}`);
                 const contestdata = await API.get(`${URL}/getcontest/${route.params.contestId}`);
                 setMyContest(contestdata.data.contest);
-                setMatch(teamdata.data.match);
                 const t = teamdata.data.teams.sort((a: any, b: any) => a._doc.points - b._doc.points);
-                setLeaderboard([...t.map((l: any, index: number) => [l.user.username, l._doc.points, index + 1])]);
+                setLeaderboard([...t.map((l: any, index: number) => [
+                    <TouchableOpacity onPress={() => handleTeamShow(l._doc)}>
+                        <View style={user?._id == l.user._id ? styles.myRow : styles.lrow}>
+                            <Text numberOfLines={1} style={styles.lItem}>{l.user.username}{" "}({`T${l?._doc?.teamId}`})</Text>
+                            <Text style={styles.lItem}>{l._doc.points}</Text>
+                            <View style={styles.rank}>
+                                <Text>{index + 1}</Text>
+                                {user._id == l.user._id ? <TouchableOpacity onPress={() => handleSwap(l._doc)}>
+                                    <AntDesign name="swap" size={24} color="black" />
+                                </TouchableOpacity> : null}
+                            </View>
+                        </View>
+                    </TouchableOpacity>])]);
             }
         }
         getteams();
-    }, []);
+    }, [route.params.contestId]);
 
     useEffect(() => {
         const all: any[] = [];
@@ -174,7 +167,38 @@ export default function ContestDetail({ navigation, route }: Props) {
         setPrizes([...all.map((index: number, a: any) => [index, a + 1])]);
     }, [myContest]);
 
+    const handleTeamShow = (team: any) => {
+        setShowTeam(team);
+        setTeamOpen(true)
+    }
 
+    const handleRejoin = async () => {
+        try {
+            const { data } = await API.get(`${URL}/reJoinCn/${myContest?._id}?oldTeamId=${switchTeam?._id}&newTeamId=${selectedTeam?._id}`)
+            setSwitchTeam(null);
+            setSelectTeams({ selected: false, team: null })
+        }
+        catch (error: any) {
+            console.log(error.response)
+        }
+    }
+
+    const handleSwap = (team: any) => {
+        console.log(matchlive, matchlive, teams?.length, 'swape begin')
+        if (!(matchlive?.result == "In Progress" || matchlive?.result == "Complete")) {
+            console.log(team, 'team')
+            setSelectTeams({ selected: true, team: null })
+            setSwitchTeam(team)
+        }
+        else {
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Failure',
+                textBody: 'Match has already began!',
+            })
+        }
+    }
+    console.log(teams, 'teamsutt');
     const FirstRoute = () => (
         <View style={{ flex: 1, backgroundColor: '#ffffff' }} >
             <Table borderStyle={{ borderWidth: 1 }}>
@@ -201,7 +225,7 @@ export default function ContestDetail({ navigation, route }: Props) {
     const SecondRoute = () => (
         <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
             <Table borderStyle={{ borderWidth: 1 }}>
-                <Row data={lTableHead} flexArr={[1, 1, 1]} style={styles.head} textStyle={styles.text} />
+                <Row data={lTableHead} flexArr={[1]} style={styles.head} textStyle={styles.text} />
             </Table>
             <ScrollView style={styles.dataWrapper}>
                 <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
@@ -226,76 +250,110 @@ export default function ContestDetail({ navigation, route }: Props) {
         leaderboard: SecondRoute
     });
 
-
     return (
-        <View style={styles.container}>
-            <>
-                <View style={styles.contest}>
-                    <View style={styles.contestTop}>
-                        <View style={styles.pool}>
-                            <Text>Prize Pool</Text>
-                            <Text>{myContest?.price}</Text>
+        <ScrollView style={styles.container}>
+            {!selectTeams?.selected ?
+                <>
+                    <View style={styles.contest}>
+                        <View style={styles.contestTop}>
+                            <View style={styles.pool}>
+                                <Text>Prize Pool</Text>
+                                <Text>{myContest?.price}</Text>
+                            </View>
+                            <View style={styles.pool}>
+                                <Text>Entry</Text>
+                                <Text>{myContest?.teamsId?.length}</Text>
+                            </View>
                         </View>
-                        <View style={styles.pool}>
-                            <Text>Entry</Text>
-                            <Text>{myContest?.teamsId?.length}</Text>
+                        <View style={styles.slider}>
+                            <Slider
+                                value={myContest?.teamsId?.length / myContest?.totalSpots}
+                                maximumTrackTintColor={'rgb(254, 244, 222)'}
+                                minimumTrackTintColor={'#b50000'}
+                                thumbTouchSize={{ width: 0, height: 0 }}
+                                thumbTintColor={'transparent'}
+                                thumbStyle={{ width: 0 }}
+                            />
+                        </View>
+                        <View style={styles.spots}>
+                            <Text>
+                                {myContest?.spotsLeft} spots left
+                            </Text>
+                            <Text>
+                                {myContest?.totalSpots} spots
+                            </Text>
+                        </View>
+                        <View style={styles.conBottom}>
+                            <View>
+                                <Text>
+                                    ₹{Math.floor(myContest?.price / myContest?.totalSpots)}
+                                </Text>
+                            </View>
+                            <View style={styles.cRow}>
+                                <View>
+                                    <Icon name="trophy" style={styles.icon} />
+                                </View>
+                                <Text>
+                                    {Math.floor((myContest?.numWinners / myContest?.totalSpots * 100))}%
+                                    Single
+                                </Text>
+                            </View>
                         </View>
                     </View>
-                    <View style={styles.slider}>
-                        <Slider
-                            value={myContest?.teamsId?.length / myContest?.totalSpots}
-                            maximumTrackTintColor={'rgb(254, 244, 222)'}
-                            minimumTrackTintColor={'#b50000'}
-                            thumbTouchSize={{ width: 0, height: 0 }}
-                            thumbTintColor={'transparent'}
-                            thumbStyle={{ width: 0 }}
+                    <View style={styles.tabContainer}>
+                        <TabView
+                            navigationState={{ index, routes }}
+                            renderScene={renderScene}
+                            onIndexChange={setIndex}
+                            initialLayout={{ width: layout.width }}
+                            overScrollMode={'auto'}
+                            renderTabBar={props => (
+                                <TabBar
+                                    {...props}
+                                    indicatorStyle={{ backgroundColor: 'white' }}
+                                    tabStyle={{ width: layout.width / 2 }}
+                                    scrollEnabled={true}
+                                    style={{ backgroundColor: '#202020' }}
+                                />
+                            )}
                         />
                     </View>
-                    <View style={styles.spots}>
-                        <Text>
-                            {myContest?.spotsLeft} spots left
-                        </Text>
-                        <Text>
-                            {myContest?.totalSpots} spots
-                        </Text>
-                    </View>
-                    <View style={styles.conBottom}>
-                        <View>
-                            <Text>
-                                ₹{Math.floor(myContest?.price / myContest?.totalSpots)}
-                            </Text>
-                        </View>
-                        <View style={styles.cRow}>
-                            <View>
-                                <Icon name="trophy" style={styles.icon} />
-                            </View>
-                            <Text>
-                                {Math.floor((myContest?.numWinners / myContest?.totalSpots * 100))}%
-                                Single
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-                <View style={styles.tabContainer}>
-                    <TabView
-                        navigationState={{ index, routes }}
-                        renderScene={renderScene}
-                        onIndexChange={setIndex}
-                        initialLayout={{ width: layout.width }}
-                        overScrollMode={'auto'}
-                        renderTabBar={props => (
-                            <TabBar
-                                {...props}
-                                indicatorStyle={{ backgroundColor: 'white' }}
-                                tabStyle={{ width: layout.width / 2 }}
-                                scrollEnabled={true}
-                                style={{ backgroundColor: '#202020' }}
-                            />
-                        )}
+                    <ViewTeam
+                        teamOpen={teamOpen}
+                        setTeamOpen={setTeamOpen}
+                        data={showTeam}
+                        match={matchlive || match_details}
+                        match_details={match_details}
+                        navigation={navigation}
                     />
-                </View>
-            </>
-        </View>
+                </> :
+                <>
+                    <Swap
+                        teams={teams}
+                        setSelectTeams={setSelectTeams}
+                        switchTeam={switchTeam}
+                        date={date} match_details={match_details}
+                        matchlive={matchlive} selectedTeam={selectedTeam}
+                        setSelectedTeam={setSelectedTeam}
+                        teamIds={myContest?.teamsId?.length > 0 ? [...myContest.teamsId] : ['id']} />
+                    <View style={styles.buttons}>
+                        <View style={styles.button}>
+                            <Button title="create team"
+                                onPress={() => navigation.navigate("Create", {
+                                    matchId: route.params.matchId,
+                                    editMode: false,
+                                    data: undefined
+                                })} color="blue" />
+                        </View>
+                        <View style={styles.button}>
+                            <Button title="Rejoin"
+                                disabled={!selectedTeam} onPress={() => handleRejoin()}
+                                color="#4c9452" />
+                        </View>
+                    </View>
+                </>
+            }
+        </ScrollView>
     );
 }
 
@@ -638,5 +696,39 @@ const styles = StyleSheet.create({
     dataWrapper: { marginTop: -1 },
     icon: {
         marginRight: 5
+    },
+    rank: {
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+        width: "33%"
+    },
+    lrow: {
+        width: "100%",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row"
+    },
+    myRow: {
+        width: "100%",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row",
+        backgroundColor: "#c7dbe2"
+    },
+    lItem: {
+        width: "33%",
+        textAlign: "center",
+        overflow: "hidden"
+    },
+    buttons: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: 25
+    },
+    button: {
+        width: "50%"
     }
 });

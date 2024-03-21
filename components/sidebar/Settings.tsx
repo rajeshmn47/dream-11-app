@@ -1,13 +1,15 @@
-import React, { createRef, useState } from 'react';
-import { View, Button, TextInput, StyleSheet, Keyboard, Dimensions, Text } from 'react-native';
+import React, { createRef, useEffect, useState } from 'react';
+import { View, Button, StyleSheet, Keyboard, Dimensions, Text } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 import { RAZORPAY_KEY } from '../../constants/matchConstants';
 import { RootStackParamList } from '../../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { URL } from '../../constants/userConstants';
-import { useSelector } from 'react-redux';
-import { API } from '../../actions/userAction';
+import { useDispatch, useSelector } from 'react-redux';
+import { API, loadUser } from '../../actions/userAction';
 import BottomBar from '../BottomBar';
+import { TextInput } from 'react-native-paper';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
@@ -15,58 +17,102 @@ const { width, height } = Dimensions.get('window');
 
 const Settings = ({ navigation, route }: Props) => {
     const { userToken, user } = useSelector((state: any) => state.user);
+    const dispatch = useDispatch();
     const [amount, setAmount] = useState<string>('');
+    const [mobileNumber, setMobileNumber] = useState<string>('');
+    const [userData, setUserData] = useState<any>({ username: "", email: "", phonenumber: "" })
     const amountInputRef: any = createRef();
 
-    const handlePayment = async () => {
-        fetch(`${URL}/payment/createpayment/${amount}`, {
-            method: 'GET',
-            headers: {
-                //Header Defination
-                'Content-Type': "application/json",
-            },
-        }).then((response) => response.json()).then((responseJson) => {
-            const options = {
-                description: 'Payment for your service',
-                image: 'https://your-company-logo.png',
-                currency: 'INR',
-                key: RAZORPAY_KEY, // Your Razorpay API Key
-                amount: parseInt(amount) * 100, // Amount in paise
-                name: 'Your Company Name',
-                order_id: responseJson.id,
-                prefill: {
-                    email: 'customer@example.com',
-                    contact: '9876543210',
-                    name: 'John Doe',
-                },
-                theme: { color: '#F37254' },
-            };
+    useEffect(() => {
+        setUserData(user)
+    }, [user])
 
-            RazorpayCheckout.open(options)
-                .then((data: any) => {
-                    API.post(`${URL}/payment/capture/${data.razorpay_payment_id}/${amount}`)
-                })
-                .catch((error: any) => {
-                    console.log(`Payment error: ${error.code} - ${error.description}`);
-                });
+    const handleUpdate = async () => {
+        API.post(`${URL}/auth/updateUser`, { ...userData }).then((responseJson) => {
+            dispatch<any>(loadUser())
+        }).catch((e) => {
+            console.log(e)
         })
     };
 
     return (
-        <View style={{ flex: 1, flexDirection: "column", justifyContent: 'flex-start', alignItems: 'center' }}>
-            <View style={styles.SectionStyle}>
-                <Text style={{ fontWeight: "200", color: "#212121", textAlign: "center" }}>
-                    Current Balance
-                </Text>
-                <Text style={{ fontWeight: "600", color: "#212121", marginTop: 5, textAlign: "center" }}>
-                    ₹{user?.wallet}
-                </Text>
+        <ScrollView contentContainerStyle={{ flex: 1, padding: 15, flexDirection: "column", justifyContent: 'flex-start', alignItems: 'center' }}>
+            <View style={styles.inputContainer}>
+                <Text>Email Address*</Text>
+                <TextInput
+                    label="Email"
+                    mode="outlined"
+                    value={userData?.email}
+                    onChangeText={text => setUserData({ ...userData, email: text })}
+                />
             </View>
-            <View style={{ width: width, paddingHorizontal: 35, marginTop: 5 }}>
-                <Button title="Add Cash" onPress={() => navigation.navigate("Payment")} color="#4c9452" />
+            <View style={styles.inputContainer}>
+                <Text>Mobile Number*</Text>
+                <TextInput
+                    label="Email"
+                    mode="outlined"
+                    value={userData?.phonenumber}
+                    onChangeText={text => setMobileNumber(text)}
+                />
             </View>
-            <BottomBar route={route} navigation={navigation} />
-        </View>
+            <View style={styles.inputContainer}>
+                <Text>Username*</Text>
+                <TextInput
+                    label="Username"
+                    mode="outlined"
+                    value={userData?.username}
+                    onChangeText={text => setUserData({ ...userData, username: text })}
+                />
+            </View>
+            <View style={styles.inputContainer}>
+                <Text>Date of Birth*</Text>
+                <TextInput
+                    label="Email"
+                    mode="outlined"
+                    value={userData?.username}
+                    onChangeText={text => setMobileNumber(text)}
+                />
+            </View>
+            <View style={styles.inputContainer}>
+                <Text>Address line 1</Text>
+                <TextInput
+                    label="Email"
+                    mode="outlined"
+                    value={userData?.username}
+                    onChangeText={text => setAmount(text)}
+                />
+            </View>
+            <View style={styles.inputContainer}>
+                <Text>Address line 2</Text>
+                <TextInput
+                    label="Email"
+                    mode="outlined"
+                    value={userData?.username}
+                    onChangeText={text => setAmount(text)}
+                />
+            </View>
+            <View style={styles.inputContainer}>
+                <Text>State*</Text>
+                <TextInput
+                    label="Email"
+                    mode="outlined"
+                    value={amount}
+                    onChangeText={text => setAmount(text)}
+                />
+            </View>
+            <View style={styles.inputContainer}>
+                <Text>Pin Code*</Text>
+                <TextInput
+                    label="Email"
+                    mode="outlined"
+                    value={amount}
+                    onChangeText={text => setAmount(text)}
+                />
+            </View>
+            <View style={{ ...styles.inputContainer, marginTop: 15 }}>
+                <Button title="Update" onPress={handleUpdate} color="#33576e" />
+            </View>
+        </ScrollView>
     );
 };
 export default Settings;
@@ -98,6 +144,20 @@ const styles = StyleSheet.create({
         marginRight: 35,
         marginTop: 20,
         marginBottom: 25,
+    },
+    inputContainer: {
+        width: "100%",
+        marginTop: 4
+    },
+    halfInputContainer: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginTop: 4
+    },
+    halfInput: {
+        width: "48%"
     },
     buttonTextStyle: {
         color: '#FFFFFF',

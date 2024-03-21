@@ -1,4 +1,4 @@
-import React, { createRef, useState } from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 import { View, Button, TextInput, StyleSheet, Keyboard, Dimensions, Text } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 import { RAZORPAY_KEY } from '../../constants/matchConstants';
@@ -8,6 +8,11 @@ import { URL } from '../../constants/userConstants';
 import { useSelector } from 'react-redux';
 import { API } from '../../actions/userAction';
 import BottomBar from '../BottomBar';
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import IonicIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Community">;
@@ -17,56 +22,33 @@ const Community = ({ navigation, route }: Props) => {
     const { userToken, user } = useSelector((state: any) => state.user);
     const [amount, setAmount] = useState<string>('');
     const amountInputRef: any = createRef();
+    const [users, setUsers] = useState<any[]>([]);
 
-    const handlePayment = async () => {
-        fetch(`${URL}/payment/createpayment/${amount}`, {
-            method: 'GET',
-            headers: {
-                //Header Defination
-                'Content-Type': "application/json",
-            },
-        }).then((response) => response.json()).then((responseJson) => {
-            const options = {
-                description: 'Payment for your service',
-                image: 'https://your-company-logo.png',
-                currency: 'INR',
-                key: RAZORPAY_KEY, // Your Razorpay API Key
-                amount: parseInt(amount) * 100, // Amount in paise
-                name: 'Your Company Name',
-                order_id: responseJson.id,
-                prefill: {
-                    email: 'customer@example.com',
-                    contact: '9876543210',
-                    name: 'John Doe',
-                },
-                theme: { color: '#F37254' },
-            };
+    useEffect(() => {
+        getUsers()
+    }, [])
 
-            RazorpayCheckout.open(options)
-                .then((data: any) => {
-                    API.post(`${URL}/payment/capture/${data.razorpay_payment_id}/${amount}`)
-                })
-                .catch((error: any) => {
-                    console.log(`Payment error: ${error.code} - ${error.description}`);
-                });
-        })
+    const getUsers = async () => {
+        const { data } = await API.get(`${URL}/auth/getallusers`)
+        console.log(data, 'data')
+        setUsers([...data?.users])
     };
-
+    console.log(users, 'users')
     return (
-        <View style={{ flex: 1, flexDirection: "column", justifyContent: 'flex-start', alignItems: 'center' }}>
-            <View style={styles.SectionStyle}>
-                <Text style={{ fontWeight: "200", color: "#212121", textAlign: "center" }}>
-                    Current Balance
-                </Text>
-                <Text style={{ fontWeight: "600", color: "#212121", marginTop: 5, textAlign: "center" }}>
-                    ₹{user?.wallet}
-                </Text>
-            </View>
-            <View style={{ width: width, paddingHorizontal: 35, marginTop: 5 }}>
-                <Button title="Add Cash" onPress={() => navigation.navigate("Payment")} color="#4c9452" />
-            </View>
+        <ScrollView contentContainerStyle={{ justifyContent: "center", overflow: "scroll", alignItems: "center", height: "100%" }}>
+            <Text style={styles.heading}>Community</Text>
+            <ScrollView contentContainerStyle={styles.cardsContainer}>
+                {users.map((u: any) =>
+                    <View style={styles.card}>
+                        <IonicIcon name="account-circle" style={styles.icon} size={25} color='#33576e' />
+                        <Text>{u?.username}</Text>
+                        <Text>{u?.matchIds?.length} matches</Text>
+                        <Text>₹{u?.totalAmountWon} Won</Text>
+                    </View>
+                )}
+            </ScrollView>
             <BottomBar route={route} navigation={navigation} />
-        </View>
+        </ScrollView>
     );
 };
 export default Community;
@@ -145,5 +127,51 @@ const styles = StyleSheet.create({
     },
     activePinCodeContainer: {
 
+    },
+    text: {
+        color: "#990000"
+    },
+    bright: {
+        color: "#FFFFFF",
+        marginLeft: 10
+    },
+    info: {
+        justifyContent: "flex-start",
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    cardsContainer: {
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        flexDirection: "row",
+        paddingHorizontal: 10,
+        overflow: "scroll",
+        height: "auto"
+    },
+    card: {
+        width: "45%",
+        backgroundColor: "#FFF",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: 10,
+        borderRadius: 5,
+        padding: 5,
+        shadowColor: 'black',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 14
+    },
+    icon: {
+        margin: 0
+    },
+    heading: {
+        fontWeight: '600',
+        fontSize: 18,
+        color: "#ff5959",
+        marginVertical: 10
     }
 });

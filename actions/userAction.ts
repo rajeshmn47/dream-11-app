@@ -17,6 +17,7 @@ import {
   URL,
 } from "../constants/userConstants";
 import AsyncStorage from "@react-native-community/async-storage";
+import { DevSettings } from "react-native";
 
 //import {API} from "../shared/api"
 
@@ -84,6 +85,7 @@ export const logout = () => async (dispatch:any) => {
   try {
     await AsyncStorage.removeItem("server_token");
     dispatch({type:LOGOUT_SUCCESS})
+    DevSettings.reload()
   } catch (error:any) {
     dispatch({ type: LOGIN_FAIL, payload: error.response.data.message });
   }

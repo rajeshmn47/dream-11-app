@@ -79,6 +79,7 @@ export default function Overview({ navigation, livescore, matchId, match_details
             clearInterval(i);
         };
     }, []);
+    console.log(livescore, 'livescore')
     return (
         <View style={styles.container}>
             <View style={styles.top}>
@@ -107,7 +108,7 @@ export default function Overview({ navigation, livescore, matchId, match_details
                     </TouchableOpacity>
                 }
             </View>
-            {livescore?.batsmanNonStriker?.batRuns &&
+            {livescore?.batsmanNonStriker &&
                 <View>
                     <View>
                         <View style={styles.teamScores}>

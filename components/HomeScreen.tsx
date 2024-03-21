@@ -45,7 +45,7 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                 <View style={styles.teamContainer}>
                     <View style={styles.team}>
                         <View style={styles.imageContainer}>
-                            <SvgUri
+                            {/* <SvgUri
                             onError={() =>
                                 console.log('error')
                             }
@@ -53,7 +53,7 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                             height="40"
                             
                             uri={data.teamHomeFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
-                        />
+                        />*/}
                         </View>
                         <Text style={styles.code}>{data.home.code}</Text>
                     </View>
@@ -61,7 +61,7 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                     <View style={styles.team}>
                         <Text style={styles.code}>{data.away.code}</Text>
                         <View style={styles.imageContainer}>
-                            <SvgUri
+                            {/*<SvgUri
                             onError={() =>
                                 console.log('error')
                             }
@@ -69,7 +69,7 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                             height="40"                         
                             uri={data.teamAwayFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
                            />
-                        
+                        */}
                         </View>
                     </View>
                 </View>

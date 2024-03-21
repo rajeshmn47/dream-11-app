@@ -150,12 +150,12 @@ class SideMenu extends React.Component {
                             <Text style={styles.text}>Help & Support</Text>
                         </View>
                     </TouchableOpacity>
-                    {/*<TouchableOpacity onPress={() => this.onPress()}>
+                    <TouchableOpacity onPress={() => this.onPress()}>
                         <View style={styles.sidebarItem}>
                             <IonicIcon name="logout" style={styles.icon} size={20} />
                             <Text style={styles.text}>Logout</Text>
                         </View>
-                    </TouchableOpacity>*/}
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.footer}>
                     <Text onPress={this.callParentScreenFunction} style={styles.link}>

@@ -88,11 +88,11 @@ export default function MyStackNavigator() {
                         <Stack.Screen name="Balance" component={Balance} />
                         <Stack.Screen name="Bank" component={UserBankAccount} />
                         <Stack.Screen name="Withdraw" component={Withdraw} />
-                        <Stack.Screen name="Winners" component={Winners} options={{ headerShown: false }} />
-                        <Stack.Screen name="Community" component={Community} options={{ headerShown: false }} />
-                        <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+                        <Stack.Screen name="Winners" component={Winners} />
+                        <Stack.Screen name="Community" component={Community} />
+                        <Stack.Screen name="Settings" component={Settings} />
                         <Stack.Screen name="HowToPlay" component={HowToPlay} options={{ headerShown: false }} />
-                        <Stack.Screen name="TermsandConditions" component={TermsandConditions} options={{ headerShown: false }} />
+                        <Stack.Screen name="TermsandConditions" component={TermsandConditions} />
                         <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
                         <Stack.Screen name="Kyc" component={KYC} options={{ headerShown: true }} />
                     </Stack.Navigator>

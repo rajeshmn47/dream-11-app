@@ -174,7 +174,6 @@ export default function CreateTeam({ navigation, route }: Props) {
               ),
             ]);
           } else {
-            console.log(route.params?.editMode, 'notlivemodeonly')
             const p: any[] = awayPlayers.concat(homePlayers).map((obj: any) => ({
               ...obj,
               isSelected: false,
@@ -327,7 +326,7 @@ export default function CreateTeam({ navigation, route }: Props) {
         </View>
         <View style={styles.info}>
           <Text style={styles.bright}>
-            {match_details?.teamHomeCode}
+            {match_details?.teamAwayCode}
           </Text>
           <Text style={styles.bright} >
             {
@@ -512,7 +511,7 @@ const styles = StyleSheet.create({
     zIndex: 0,
     position: "absolute",
     bottom: 100,
-    width:"100%"
+    width: "100%"
   },
   next: {
     backgroundColor: 'green',
@@ -627,25 +626,25 @@ const styles = StyleSheet.create({
   blackBg: {
     backgroundColor: "#212121",
     borderRadius: 5,
-    paddingHorizontal: 5,
+    paddingHorizontal: 2,
     paddingVertical: 0,
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
-    bottom: 3
+    bottom: 5
   },
   whiteBg: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#BBCF9B",
     borderRadius: 5,
     paddingHorizontal: 5,
     paddingVertical: 2,
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
-    bottom: 4
+    bottom: 7
   },
   black: {
     color: "#212121",
-    textTransform: "capitalize"
+    textTransform: "uppercase"
   }
 });

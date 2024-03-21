@@ -2,8 +2,9 @@ import React, { createRef, useState } from 'react';
 import { View, Button, TextInput, StyleSheet, Keyboard, Dimensions, Text } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 import { RAZORPAY_KEY } from '../../constants/matchConstants';
-import { RootStackParamList } from '../HomeScreen';
+import { RootStackParamList } from '../../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DataTable } from 'react-native-paper';
 import { URL } from '../../constants/userConstants';
 import { useSelector } from 'react-redux';
 import { API } from '../../actions/userAction';
@@ -17,53 +18,50 @@ const Winners = ({ navigation, route }: Props) => {
     const { userToken, user } = useSelector((state: any) => state.user);
     const [amount, setAmount] = useState<string>('');
     const amountInputRef: any = createRef();
-
-    const handlePayment = async () => {
-        fetch(`${URL}/payment/createpayment/${amount}`, {
-            method: 'GET',
-            headers: {
-                //Header Defination
-                'Content-Type': "application/json",
-            },
-        }).then((response) => response.json()).then((responseJson) => {
-            const options = {
-                description: 'Payment for your service',
-                image: 'https://your-company-logo.png',
-                currency: 'INR',
-                key: RAZORPAY_KEY, // Your Razorpay API Key
-                amount: parseInt(amount) * 100, // Amount in paise
-                name: 'Your Company Name',
-                order_id: responseJson.id,
-                prefill: {
-                    email: 'customer@example.com',
-                    contact: '9876543210',
-                    name: 'John Doe',
-                },
-                theme: { color: '#F37254' },
-            };
-
-            RazorpayCheckout.open(options)
-                .then((data: any) => {
-                    API.post(`${URL}/payment/capture/${data.razorpay_payment_id}/${amount}`)
-                })
-                .catch((error: any) => {
-                    console.log(`Payment error: ${error.code} - ${error.description}`);
-                });
-        })
-    };
+    const [items] = React.useState<any[]>([
+        {
+            key: 1,
+            name: 'Cupcake',
+            calories: 356,
+            fat: 16,
+        },
+        {
+            key: 2,
+            name: 'Eclair',
+            calories: 262,
+            fat: 16,
+        },
+        {
+            key: 3,
+            name: 'Frozen yogurt',
+            calories: 159,
+            fat: 6,
+        },
+        {
+            key: 4,
+            name: 'Gingerbread',
+            calories: 305,
+            fat: 3.7,
+        },
+    ]);
 
     return (
-        <View style={{ flex: 1, flexDirection: "column", justifyContent: 'flex-start', alignItems: 'center' }}>
-            <View style={styles.SectionStyle}>
-                <Text style={{ fontWeight: "200", color: "#212121", textAlign: "center" }}>
-                    Current Balance
-                </Text>
-                <Text style={{ fontWeight: "600", color: "#212121", marginTop: 5, textAlign: "center" }}>
-                    ₹{user?.wallet}
-                </Text>
-            </View>
-            <View style={{ width: width, paddingHorizontal: 35, marginTop: 5 }}>
-                <Button title="Add Cash" onPress={() => navigation.navigate("Payment")} color="#4c9452" />
+        <View style={styles.container}>
+            <View style={styles.winnersList}>
+                <DataTable>
+                    <DataTable.Header>
+                        <DataTable.Title>Rank</DataTable.Title>
+                        <DataTable.Title numeric>Username</DataTable.Title>
+                        <DataTable.Title numeric>Points</DataTable.Title>
+                    </DataTable.Header>
+                    {items.map((item: any, rank: number) => (
+                        <DataTable.Row key={item.key}>
+                            <DataTable.Cell>#{rank + 1}</DataTable.Cell>
+                            <DataTable.Cell>{item.name}</DataTable.Cell>
+                            <DataTable.Cell numeric>{item.calories}</DataTable.Cell>
+                        </DataTable.Row>
+                    ))}
+                </DataTable>
             </View>
             <BottomBar route={route} navigation={navigation} />
         </View>
@@ -72,6 +70,18 @@ const Winners = ({ navigation, route }: Props) => {
 export default Winners;
 
 const styles = StyleSheet.create({
+    container: {
+        backgroundColor: 'white',
+        color: 'white',
+        fontStyle: 'italic'
+    },
+    winnersList: {
+        backgroundColor: 'white',
+        color: 'white',
+        zIndex: 0,
+        height: "101%",
+        width: "100%"
+    },
     mainBody: {
         height: 400,
         justifyContent: 'center',

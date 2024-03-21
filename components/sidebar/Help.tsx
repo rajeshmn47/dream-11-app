@@ -53,18 +53,28 @@ const Help = ({ navigation, route }: Props) => {
     };
 
     return (
-        <View style={{ flex: 1, flexDirection: "column", justifyContent: 'flex-start', alignItems: 'center' }}>
-            <View style={styles.SectionStyle}>
-                <Text style={{ fontWeight: "200", color: "#212121", textAlign: "center" }}>
-                    Current Balance
-                </Text>
-                <Text style={{ fontWeight: "600", color: "#212121", marginTop: 5, textAlign: "center" }}>
-                    ₹{user?.wallet}
-                </Text>
-            </View>
-            <View style={{ width: width, paddingHorizontal: 35, marginTop: 5 }}>
-                <Button title="Add Cash" onPress={() => navigation.navigate("Payment")} color="#4c9452" />
-            </View>
+        <View style={{ flex: 1, padding: 15 }}>
+            <Text style={styles.title}>
+                Contact Us
+            </Text>
+            <Text>
+                You may contact us using the information below:
+            </Text>
+            <Text>
+                Merchant Legal entity name: THE POWER11
+            </Text>
+            <Text>
+                Registered Address: 32B Grahi Nova bad, Bangalore, Uttar Pradesh, PIN: 251309
+            </Text>
+            <Text>
+                Operational Address: 32B Grahi Nova bad, Bangalore, Uttar Pradesh, PIN: 251309
+            </Text>
+            <Text>
+                Email ID: thepowerplay@email.com
+            </Text>
+            <Text>
+                Thank you for reaching out to us!
+            </Text>
             <BottomBar route={route} navigation={navigation} />
         </View>
     );
@@ -77,6 +87,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#ffffff',
         alignContent: 'center',
+    },
+    title: {
+        fontWeight: "600",
+        textAlign: "center",
+        fontSize: 18,
+        marginBottom: 5
     },
     SectionStyle: {
         width: width,

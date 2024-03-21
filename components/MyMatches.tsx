@@ -116,7 +116,7 @@ export default function MyMatches({ navigation, route }: Props) {
     const renderCompletedItem: ListRenderItem<Match> = ({ item }) => <Item completed={true} live={false} data={item} date={date} navigation={navigation} />;
     useEffect(() => {
         async function getupcoming() {
-            setLoading(true);
+            setRefreshing(true);
             try {
                 const response = await API.get(`${URL}/myMatches`);
                 const a: [] = response.data.upcoming.results.sort(
@@ -131,7 +131,7 @@ export default function MyMatches({ navigation, route }: Props) {
                 setUpcoming([...a]);
                 setLive([...b]);
                 setCompleted([...c]);
-                setLoading(false);
+                setRefreshing(false);
             } catch (error) {
                 console.error(error);
             }
@@ -181,7 +181,7 @@ export default function MyMatches({ navigation, route }: Props) {
                                 onRefresh={refreshHandler}
                             />
                         }
-                    /> : <Text style={styles.errorText}>No live matches now</Text>}
+                    /> : <Text style={styles.errorText}>No live matches now!</Text>}
                 </View>
             </View>
         </View>
@@ -282,7 +282,8 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: "#aa0000",
-        textAlign: "center"
+        textAlign: "center",
+        marginTop: 5
     },
     matchesContainer: {
         backgroundColor: 'white',
