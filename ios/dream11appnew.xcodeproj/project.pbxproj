@@ -79,7 +79,7 @@
 			name = Libraries;
 			sourceTree = "<group>";
 		};
-		83CBB9F61A601CBA00E9B192 = {
+		83CBB9F61A601CBA00E9B192 /* PBXGroup */ = {
 			isa = PBXGroup;
 			children = (
 				13B07FAE1A68108700A75B9A /* dream11appnew */,
@@ -163,7 +163,7 @@
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		83CBB9F71A601CBA00E9B192 /* Project object */ = {
+		83CBB9F71A601CBA00E9B192 = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1130;
@@ -181,7 +181,7 @@
 				en,
 				Base,
 			);
-			mainGroup = 83CBB9F61A601CBA00E9B192;
+			mainGroup = 83CBB9F61A601CBA00E9B192 /* PBXGroup */;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -199,7 +199,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				22E001CFFAA14EFFAEFEDE0B /* dream11appnew-Bridging-Header.h in Resources */,
+				22E001CFFAA14EFFAEFEDE0B,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,13 +321,13 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rajeshmn47.dream11appnew";
+				PRODUCT_BUNDLE_IDENTIFIER = com.rajeshmn47.dream11appnew;
 				PRODUCT_NAME = "dream11appnew";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				SWIFT_OBJC_BRIDGING_HEADER = dream11appnew/dream11appnew-Bridging-Header.h;
+				SWIFT_OBJC_BRIDGING_HEADER = "dream11appnew/dream11appnew-Bridging-Header.h";
 				CODE_SIGN_ENTITLEMENTS = dream11appnew/dream11appnew.entitlements;
 			};
 			name = Debug;
@@ -348,12 +348,12 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rajeshmn47.dream11appnew";
+				PRODUCT_BUNDLE_IDENTIFIER = com.rajeshmn47.dream11appnew;
 				PRODUCT_NAME = "dream11appnew";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				SWIFT_OBJC_BRIDGING_HEADER = dream11appnew/dream11appnew-Bridging-Header.h;
+				SWIFT_OBJC_BRIDGING_HEADER = "dream11appnew/dream11appnew-Bridging-Header.h";
 				CODE_SIGN_ENTITLEMENTS = dream11appnew/dream11appnew.entitlements;
 			};
 			name = Release;
@@ -486,5 +486,5 @@
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
+	rootObject = 83CBB9F71A601CBA00E9B192;
 }

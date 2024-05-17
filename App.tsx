@@ -42,6 +42,7 @@ export type RootStackParamList = {
   Home: undefined;
   Detail: { matchId: string };
   Login: undefined,
+  Post: undefined;
   Register: undefined,
   Create: { matchId: string, editMode: Boolean, data: any },
   Edit: { matchId: string, editMode: Boolean, data: any },

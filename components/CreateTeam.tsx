@@ -33,7 +33,7 @@ import {
 } from "firebase/firestore";
 import db from "../firebase/config";
 import Overview from './topbar/Overview';
-import { URL } from '../constants/userConstants';
+import { IMG_LEFT, IMG_RIGHT, URL } from '../constants/userConstants';
 import { checkar, checkwk, getPlayerName, getShrtName } from '../utils/playersFilter';
 import { API } from '../actions/userAction';
 import Loader from './loader/Loader';
@@ -278,7 +278,7 @@ export default function CreateTeam({ navigation, route }: Props) {
       <View style={data.isSelected ? styles.pSelected : styles.notSelected}>
         <View style={!data.isSelected ? styles.teamContainer : styles.selected}>
           <View style={{ backgroundColor: "transparent", position: "relative" }}>
-            <Image source={{ uri: getImgurl(data.image, data.playerName) }} style={{ width: 90, height: 90 }} />
+            <Image source={{ uri:`${IMG_LEFT}`+`${data?.playerId}`+`${IMG_RIGHT}` }} style={{ width: 90, height: 90 }} />
             {match_details?.teamHomePlayers.find((pl: any) => pl.playerId == data.playerId) ?
               <View style={styles.whiteBg}><Text style={styles.black}>{match_details?.teamHomeCode}</Text></View>
               : <View style={styles.blackBg}><Text style={styles.bright}>{match_details?.teamAwayCode}</Text></View>

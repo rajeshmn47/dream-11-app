@@ -3,6 +3,7 @@ import Icon from 'react-native-vector-icons/SimpleLineIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome5';
+import AntIcon from 'react-native-vector-icons/AntDesign';
 import { useEffect } from "react";
 import { useNavigationState } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -30,6 +31,14 @@ export default function BottomBar({ navigation, route }: { navigation: any, rout
                         <Octicons name="database" color="#fff" size={20} />
                     </View>
                     <Text style={styles.textColor}>My Matches</Text>
+                </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Post', { userId: user?._id })}>
+                <View style={route.name == "Post" ? styles.selected : styles.iconContainer}>
+                    <View style={{ marginBottom: 10 }}>
+                        <AntIcon name="pluscircleo" color="#fff" size={20} />
+                    </View>
+                    <Text style={styles.textColor}>Post</Text>
                 </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Community')}>
@@ -71,7 +80,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'column',
         height: '100%',
-        width: w / 4
+        width: w / 5
     },
     selected: {
         backgroundColor: '#000000',
@@ -79,7 +88,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        width: w / 4,
+        width: w / 5,
         height: '100%'
     },
     match: {

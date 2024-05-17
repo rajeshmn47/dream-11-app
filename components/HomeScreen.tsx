@@ -11,9 +11,11 @@ import Mega from "./homescreen/Mega";
 import { SceneMap, TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 import { SvgUri } from 'react-native-svg';
 import { URL } from '../constants/userConstants';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Loader from './loader/Loader';
 import { Timer } from './Timer';
 import { RootStackParamList } from '../App';
+import PostItem, { Post } from './post/PostItem';
 
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Home">;
@@ -84,6 +86,8 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
         </TouchableOpacity>
     );
 }
+
+
 const { height, width } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation, route }: Props) {
@@ -91,6 +95,7 @@ export default function HomeScreen({ navigation, route }: Props) {
     const { userToken, user } = useSelector((state: any) => state.user);
     const [text, setText] = useState('');
     const [upcoming, setUpcoming] = useState<any[]>();
+    const [featuredPosts, setFeaturedPosts] = useState<any[]>();
     const [completed, setCompleted] = useState<any[]>([])
     const [loading, setLoading] = useState<Boolean>(false);
     const [refreshing, setRefreshing] = useState<Boolean>(false);
@@ -98,14 +103,28 @@ export default function HomeScreen({ navigation, route }: Props) {
     const layout = useWindowDimensions();
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-        { key: 'upcoming', title: 'Upcoming' },
-        { key: 'featured', title: 'Featured' }]);
+        { key: 'featured', title: 'Featured' },
+        { key: 'upcoming', title: 'Upcoming' }]);
     const renderItem: ListRenderItem<Match> = ({ item }) => <Item data={item} date={new Date()} navigation={navigation} />;
+    const renderPost: ListRenderItem<Post> = ({ item }) => <PostItem data={item} date={new Date()} navigation={navigation} handleLike={handleLike} submitComment={submitComment}/>;
     useEffect(() => {
         if (user?._id) {
             refreshHandler();
         }
     }, [user]);
+
+    const handleLike = async (i: any) => {
+        await API.get(`${URL}/like/${i}`);
+        const postResponse = await API.get(`${URL}/allPosts`);
+        setFeaturedPosts([...postResponse.data.posts])
+    }
+
+    const submitComment = async (id: any, comment: any,setComment:any) => {
+        API.post(`${URL}/addcomment/${id}`, { comment: comment });
+        const postResponse = await API.get(`${URL}/allPosts`);
+        setFeaturedPosts([...postResponse.data.posts]);
+        setComment('')
+    }
 
     async function refreshHandler() {
         setRefreshing(true);
@@ -116,6 +135,8 @@ export default function HomeScreen({ navigation, route }: Props) {
             );
             setUpcoming([...a]);
             setRefreshing(false);
+            const postResponse = await API.get(`${URL}/allPosts`);
+            setFeaturedPosts([...postResponse.data.posts])
         } catch (error) {
             setRefreshing(false);
         }
@@ -126,8 +147,8 @@ export default function HomeScreen({ navigation, route }: Props) {
             <View>
                 <View>
                     <FlatList
-                        data={upcoming}
-                        renderItem={renderItem}
+                        data={featuredPosts}
+                        renderItem={renderPost}
                         keyExtractor={(item: any) => item._id}
                         refreshControl={
                             <RefreshControl
@@ -156,8 +177,8 @@ export default function HomeScreen({ navigation, route }: Props) {
     );
 
     const renderScene = SceneMap({
-        upcoming: FirstRoute,
-        featured: SecondRoute
+        featured: FirstRoute,
+        upcoming: SecondRoute
     });
 
     return (
@@ -182,7 +203,7 @@ export default function HomeScreen({ navigation, route }: Props) {
                             tabStyle={{ width: width / 2 }}
                             scrollEnabled={true}
                             renderTabBarItem={(props) => (
-                                <View style={props.key == (index == 0 ? 'upcoming' : 'featured') ? styles.firstTab : styles.secondTab}>
+                                <View style={props.key == (index == 0 ? 'featured' : 'upcoming') ? styles.firstTab : styles.secondTab}>
                                     <TabBarItem
                                         {...props}
                                         activeColor='white'
@@ -203,7 +224,8 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
         color: 'white',
-        fontStyle: 'italic'
+        fontStyle: 'italic',
+        position: 'relative'
     },
     tabsContainer: {
         backgroundColor: 'white',
@@ -243,6 +265,28 @@ const styles = StyleSheet.create({
         height: 160,
         backgroundColor: 'white',
         overflow: "hidden"
+    },
+    postTop: {
+        height: 40,
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        color: 'white',
+        flexDirection: 'row'
+    },
+    post: {
+        marginHorizontal: 15,
+        marginVertical: 15,
+        height: 400,
+        backgroundColor: 'white',
+        overflow: "hidden"
+    },
+    actions: {
+        backgroundColor: 'white',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        color: 'white',
+        flexDirection: 'row'
     },
     team: {
         backgroundColor: 'white',

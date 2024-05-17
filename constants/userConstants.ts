@@ -54,15 +54,18 @@ export const CLEAR_ERRORS = "CLEAR_ERRORS";
 
 export const RESTORE_TOKEN = "RESTORE_TOKEN";
 
+export const IMG_LEFT = "https://firebasestorage.googleapis.com/v0/b/dreamelevenclone.appspot.com/o/images%2F";
+export const IMG_RIGHT = ".png?alt=media&token=4644f151-3dfd-4883-9398-4191bed34854";
+
 function geturl() {
   const current = process.env.REACT_APP_API;
   if (current == "local") {
-    //return "http://192.168.202.175:8000";
-    //return "https://backendforpuand-dream11.onrender.com";
-    return "https://apk.thepowerplay.co";
+    //return "http://192.168.234.175:8000";
+    return "https://backendforpuand-dream11.onrender.com";
+    //return "https://apk.thepowerplay.co";
   }
   //return "https://backendforpuand-dream11.onrender.com";
-  return "http://192.168.202.175:8000";
+    return "http://192.168.8.175:8000";
   //return "https://apk.thepowerplay.co";
 }
 
