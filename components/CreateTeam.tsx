@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, ScrollView, StyleSheet, TouchableHighlight } from 'react-native';
+import { Button, ImageBackground, ScrollView, StyleSheet, TouchableHighlight } from 'react-native';
 import { Text, FlatList, TextInput, View, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { ListRenderItem } from 'react-native';
@@ -8,6 +8,7 @@ import FastImage from 'react-native-fast-image';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Slider } from '@miblanchard/react-native-slider';
 import SvgUri from 'react-native-svg-uri';
+import { AntDesign } from '@expo/vector-icons';
 import axios from "axios";
 import { getDisplayDate } from '../utils/dateFormat';
 import { RootStackParamList } from './../App';
@@ -18,6 +19,7 @@ import { TabView, SceneMap, TabBar, TabBarItem } from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/AntDesign';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import { useWindowDimensions } from 'react-native';
+import RadialGradient from 'react-native-radial-gradient';
 import { getImgurl } from '../utils/images';
 import {
   collection,
@@ -37,6 +39,18 @@ import { IMG_LEFT, IMG_RIGHT, URL } from '../constants/userConstants';
 import { checkar, checkwk, getPlayerName, getShrtName } from '../utils/playersFilter';
 import { API } from '../actions/userAction';
 import Loader from './loader/Loader';
+import {
+  Inter_100Thin,
+  Inter_200ExtraLight,
+  Inter_300Light,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+  useFonts
+} from '@expo-google-fonts/inter';
 
 
 export interface Contest {
@@ -52,6 +66,9 @@ export type Props = NativeStackScreenProps<RootStackParamList, "Create">;
 export default function CreateTeam({ navigation, route }: Props) {
   const dispatch = useDispatch();
   const { match_details, matchlive } = useSelector((state: any) => state.match);
+  let [fontsLoaded] = useFonts({
+    Inter_600SemiBold, Inter_500Medium, Inter_400Regular
+  });
   const [text, setText] = useState('');
   const [upcoming, setUpcoming] = useState([]);
   const [date, setDate] = useState<Date>(new Date());
@@ -73,7 +90,12 @@ export default function CreateTeam({ navigation, route }: Props) {
   }
 
   const FirstRoute = () => (
-    <View style={{ flex: 1, backgroundColor: '#ffffff' }} >
+    <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      <View style={styles.header}>
+        <Text>Player</Text>
+        <Text>Points</Text>
+        <Text>Credits</Text>
+      </View>
       <View>
         <View>
           <FlatList
@@ -88,6 +110,11 @@ export default function CreateTeam({ navigation, route }: Props) {
 
   const SecondRoute = () => (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      <View style={styles.header}>
+        <Text>Player</Text>
+        <Text>Points</Text>
+        <Text>Credits</Text>
+      </View>
       <View>
         <View>
           <FlatList
@@ -102,6 +129,11 @@ export default function CreateTeam({ navigation, route }: Props) {
 
   const ThirdRoute = () => (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      <View style={styles.header}>
+        <Text>Player</Text>
+        <Text>Points</Text>
+        <Text>Credits</Text>
+      </View>
       <View>
         <View>
           <FlatList
@@ -116,6 +148,11 @@ export default function CreateTeam({ navigation, route }: Props) {
 
   const FourthRoute = () => (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      <View style={styles.header}>
+        <Text>Player</Text>
+        <Text>Points</Text>
+        <Text>Credits</Text>
+      </View>
       <View>
         <View>
           <FlatList
@@ -137,10 +174,10 @@ export default function CreateTeam({ navigation, route }: Props) {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    { key: 'wk', title: 'Wk' },
-    { key: 'bat', title: 'Bat' },
-    { key: 'ar', title: 'Ar' },
-    { key: 'bowl', title: 'Bowl' }
+    { key: 'wk', title: 'Wk(3)' },
+    { key: 'bat', title: 'Bat(3)' },
+    { key: 'ar', title: 'Ar(3)' },
+    { key: 'bowl', title: 'Bowl(2)' }
   ]);
   const renderItem: ListRenderItem<Contest> = ({ item }) => <Item data={item} date={date} />;
   useEffect(() => {
@@ -277,28 +314,31 @@ export default function CreateTeam({ navigation, route }: Props) {
       onPress={!data.isSelected ? () => handleClick(data._id) : () => handleRemove(data._id)}>
       <View style={data.isSelected ? styles.pSelected : styles.notSelected}>
         <View style={!data.isSelected ? styles.teamContainer : styles.selected}>
-          <View style={{ backgroundColor: "transparent", position: "relative" }}>
-            <Image source={{ uri:`${IMG_LEFT}`+`${data?.playerId}`+`${IMG_RIGHT}` }} style={{ width: 90, height: 90 }} />
+          <View style={{ backgroundColor: "transparent", alignItems: 'center' }}>
+            <Image source={{ uri: `${IMG_LEFT}` + `${data?.playerId}` + `${IMG_RIGHT}` }} style={{ width: 60, height: 50 }} />
             {match_details?.teamHomePlayers.find((pl: any) => pl.playerId == data.playerId) ?
-              <View style={styles.whiteBg}><Text style={styles.black}>{match_details?.teamHomeCode}</Text></View>
-              : <View style={styles.blackBg}><Text style={styles.bright}>{match_details?.teamAwayCode}</Text></View>
+              <View style={styles.whiteBg}><Text style={styles.black}>{match_details?.teamHomeCode}</Text>
+              </View>
+              : <View style={styles.blackBg}><Text style={styles.bright}>{match_details?.teamAwayCode}</Text>
+              </View>
             }
           </View>
-          <View style={styles.team}>
-            <Text style={{ textTransform: "capitalize" }}>{getShrtName(data.playerName)}</Text>
+          <View style={styles.middle}>
+            <Text style={{ ...styles.name, textTransform: "capitalize" }} numberOfLines={1}>{getShrtName(data.playerName)}</Text>
+            <Text numberOfLines={1} style={styles.selBy}>Sel by 91.21%</Text>
+            <View style={styles.redLine}>
+              <View style={styles.redDot}></View>
+              <Text style={styles.redText}>played last match</Text>
+            </View>
           </View>
           <View style={styles.team}>
-            <Text>9.0</Text>
+            <Text style={{ fontFamily: "Inter_600SemiBold", color: "#7c7c7c" }}>600</Text>
           </View>
           <View style={styles.team}>
-            {!data.isSelected ?
-              <Text>
-                <Icon name="pluscircleo" size={30} color="#900" />
-              </Text> :
-              <Text>
-                <Icon name="minuscircleo" size={30} color="#900" />
-              </Text>
-            }
+            <Text style={{ fontFamily: "Inter_600SemiBold" }}>9.0</Text>
+          </View>
+          <View style={styles.team}>
+            <Image source={require('../assets/add.png')} style={{ width: 22, height: 22 }} />
           </View>
         </View>
       </View>
@@ -306,122 +346,152 @@ export default function CreateTeam({ navigation, route }: Props) {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.matchInfo}>
-        <View style={styles.info}>
-          <Text style={styles.bright}>Players</Text>
-          <Text style={styles.bright}>{players.filter((k) => k.isSelected === true).length}/11</Text>
-        </View>
-        <View style={styles.info}>
-          <Text style={styles.bright}>
-            {match_details?.teamHomeCode}
-          </Text>
-          <Text style={styles.bright} >
-            {
-              match?.teamHomePlayers.filter((f: any) =>
-                players?.filter((k) => k.isSelected === true)?.some((s: any) => f.playerId == s.playerId)
-              ).length
-            }
-          </Text>
-        </View>
-        <View style={styles.info}>
-          <Text style={styles.bright}>
-            {match_details?.teamAwayCode}
-          </Text>
-          <Text style={styles.bright} >
-            {
-              match?.teamAwayPlayers.filter((f: any) =>
-                players?.filter((k) => k.isSelected === true)?.some((s: any) => f.playerId == s.playerId)
-              ).length
-            }
-          </Text>
-        </View>
-        <View style={styles.info}>
-          <Text style={styles.bright}>Credits Left</Text>
-          <Text style={styles.bright}>100</Text>
-        </View>
-      </View>
-      <View style={styles.boxes}>
-        {players.filter((k) => k.isSelected === true).length <= 11 &&
-          players
-            .filter((k) => k.isSelected === true)
-            .map((p, i: number) => (
-              <View style={styles.sBox}>
-                <Text style={styles.sText}>{i + 1}</Text>
+    <>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={"#212121"} style='light' />
+        <ImageBackground source={require('../assets/cricketbackground.png')} resizeMode="cover" style={styles.image}>
+          <View style={{ height: 170, alignItems: 'center', backgroundColor: "rgba(0, 0, 0, 0.6)" }}>
+            <View style={{ alignItems: "center" }}>
+              <View style={styles.backContainer}>
+                <TouchableHighlight onPress={() => navigation.goBack()}>
+                  <View style={styles.backIcon}>
+                    <AntDesign name="arrowleft" size={24} color="white" />
+                    <Text style={styles.backText}>Create Team</Text>
+                  </View>
+                </TouchableHighlight>
+                <AntDesign name="questioncircleo" size={24} color="#FFF" />
               </View>
-            ))}
-        {players.filter((k) => k.isSelected === true).length <= 11 &&
-          players
-            .slice(
-              0,
-              11 - players.filter((k) => k.isSelected === true).length
-            )
-            .map((g, i) => (
-              <View style={styles.nBox}>
-                <Text style={styles.nText}>{i + 1 + players.filter((k) => k.isSelected === true).length}</Text>
-              </View>
-            ))}
-      </View>
-      <View style={styles.players}>
-        <Loader loading={loading} />
-        <TabView
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={{ width: layout.width }}
-          renderTabBar={props => (
-            <TabBar
-              {...props}
-              indicatorStyle={{ backgroundColor: 'black' }}
-              scrollEnabled={true}
-              renderTabBarItem={(props) => (
-                <View style={props.key == (!(index == 0) ? 'upcoming' : 'featured') ? styles.firstTab : styles.firstTab}>
-                  <TabBarItem
-                    {...props}
-                    activeColor='white'
-                    inactiveColor='black'
-                  />
+            </View>
+
+            <View style={styles.codes}>
+              <View style={styles.codeContainer}>
+                <View style={styles.blueBackground}>
+                  <Image source={require('../assets/kolkata.png')} style={{ width: 30, height: 30 }} />
                 </View>
-              )}
-            />
-          )}
-        />
-      </View>
-      <View style={styles.nextContainer}>
-        <View style={styles.preview}>
-          <Icon name="eyeo" color={'#FFFFFF'} />
-          <Text style={styles.bright}>
-            Preview / Lineup
-          </Text>
-          <IonicIcon name="people" color={'#FFFFFF'} />
-        </View>
-        <TouchableHighlight style={
-          players.filter((k) => k.isSelected === true).length >= 11
-            ? styles.notDisabled
-            : styles.disabled
-        }
-          onPress={() => handleNext()}
-        >
-          <View
-            style={
-              players.filter((k) => k.isSelected === true).length >= 11
-                ? styles.next
-                : styles.disabled
-            }
-            pointerEvents={players.filter((k) => k.isSelected === true).length >= 11 ? 'none' : 'auto'}
-          >
-            <Text style={styles.bright}>next</Text>
+                <Text style={styles.code}>{match_details?.teamAwayCode}</Text>
+              </View>
+              <Text style={styles.code}>22 h 30 m left</Text>
+              <View style={styles.codeContainer}>
+                <Text style={styles.code}>{match_details?.teamHomeCode}</Text>
+                <View style={styles.whiteBackground}>
+                  <Image source={require('../assets/srh.png')} style={{ width: 30, height: 30 }} />
+                </View>
+              </View>
+            </View>
+            <View style={styles.matchInfo}>
+              <View style={styles.info}>
+                <Text style={{ ...styles.backText, marginRight: 5 }}>Players</Text>
+                <Text style={{ marginRight: 5, ...styles.backText }}>{players.filter((k) => k.isSelected === true).length}/11</Text>
+              </View>
+              <View style={styles.boxes}>
+                {players.filter((k) => k.isSelected === true).length <= 11 &&
+                  players
+                    .filter((k) => k.isSelected === true)
+                    .map((p, i: number) => (
+                      <View style={styles.sBox}>
+                        <RadialGradient
+                          colors={['#CC4040', '#662020']}
+                          style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}
+                          radius={24}>
+                          <Text style={styles.sText}>{i + 1 + players.filter((k) => k.isSelected === true).length}</Text>
+                        </RadialGradient>
+                      </View>
+                    ))}
+                {players.filter((k) => k.isSelected === true).length <= 11 &&
+                  players
+                    .slice(
+                      0,
+                      11 - players.filter((k) => k.isSelected === true).length
+                    )
+                    .map((g, i) => (
+                      <View style={styles.nBox}>
+                      </View>
+                    ))}
+              </View>
+            </View>
           </View>
-        </TouchableHighlight>
-      </View>
-    </View>
+        </ImageBackground >
+        <View style={styles.players}>
+          <Loader loading={false} />
+          <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{ width: layout.width }}
+            renderTabBar={props => (
+              <TabBar
+                {...props}
+                indicatorStyle={{ backgroundColor: 'black' }}
+                scrollEnabled={true}
+                renderTabBarItem={(props) => (
+                  <View style={props.key == (!(index == 0) ? 'upcoming' : 'featured') ? styles.firstTab : styles.firstTab}>
+                    <TabBarItem
+                      {...props}
+                      activeColor='white'
+                      inactiveColor='white'
+                    />
+                  </View>
+                )}
+              />
+            )}
+          />
+        </View>
+        <View style={styles.nextContainer}>
+          <View style={styles.preview}>
+            <Icon name="eyeo" color={'#FFFFFF'} />
+            <Text style={styles.black}>
+              + Preview | Lineup
+            </Text>
+            <IonicIcon name="people" color={'#FFFFFF'} />
+          </View>
+          <TouchableHighlight style={
+            players.filter((k) => k.isSelected === true).length >= 11
+              ? styles.notDisabled
+              : styles.disabledButton
+          }
+            onPress={() => handleNext()}
+          >
+            <View
+              style={
+                players.filter((k) => k.isSelected === true).length >= 11
+                  ? styles.nextButton
+                  : styles.disabledButton
+              }
+              pointerEvents={players.filter((k) => k.isSelected === true).length >= 11 ? 'none' : 'auto'}
+            >
+              <Text style={styles.bright}>next</Text>
+            </View>
+          </TouchableHighlight>
+        </View>
+      </View >
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 20,
     backgroundColor: '#FFF',
     color: 'white',
+  },
+  backText: {
+    color: 'white',
+    fontFamily: "Inter_400Regular"
+  },
+  backContainer: {
+    backgroundColor: 'transparent',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: 380,
+    paddingHorizontal: 4,
+    paddingVertical: 5
+  },
+  backIcon: {
+    backgroundColor: 'transparent',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   contest: {
     elevation: 14,
@@ -435,18 +505,25 @@ const styles = StyleSheet.create({
     height: 90,
     borderBottomColor: "#ccc",
     borderBottomWidth: 1,
-    backgroundColor: '#8abb9d'
+    backgroundColor: '#F2F2F2'
+  },
+  middle: {
+    backgroundColor: 'transparent',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    color: 'white',
+    flexDirection: 'column',
+    height: 60,
+    padding: 10
   },
   team: {
-    flex: 1,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
     color: 'white',
-    flexDirection: 'row',
+    flexDirection: 'column',
     height: 60,
-    padding: 10,
-    width: 40
+    padding: 10
   },
   subContainer: {
     flex: 1,
@@ -487,20 +564,20 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   preview: {
-    flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'space-evenly',
     color: 'white',
     flexDirection: 'row',
     height: 40,
     padding: 2,
-    borderRadius: 15,
+    borderColor: "#262626",
+    borderRadius: 30,
+    borderWidth: 1,
     width: '50%'
   },
   nextContainer: {
-    flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'space-evenly',
     color: 'white',
@@ -514,7 +591,7 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   next: {
-    backgroundColor: 'green',
+    backgroundColor: '#262626',
     alignItems: 'center',
     justifyContent: 'space-evenly',
     color: '#FFF',
@@ -523,6 +600,27 @@ const styles = StyleSheet.create({
     padding: 2,
     borderRadius: 15,
     width: '100%'
+  },
+  nextButton: {
+    width: 100,
+    backgroundColor: '#262626',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    color: '#FFF',
+    flexDirection: 'row',
+    height: 40,
+    padding: 2,
+    borderRadius: 15
+  },
+  disabledButton: {
+    backgroundColor: '#212121',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    flexDirection: 'row',
+    height: 40,
+    padding: 2,
+    borderRadius: 30,
+    width: 100
   },
   matchTop: {
     borderBottomColor: '#DDDDDD',
@@ -553,6 +651,7 @@ const styles = StyleSheet.create({
     width: '50%'
   },
   notDisabled: {
+    backgroundColor: "#212121",
     alignItems: 'center',
     justifyContent: 'space-evenly',
     color: 'white',
@@ -560,7 +659,25 @@ const styles = StyleSheet.create({
     height: 40,
     padding: 2,
     borderRadius: 15,
-    width: '50%'
+    width: 100
+  },
+  blueBackground: {
+    width: 35,
+    height: 35,
+    backgroundColor: '#3A225D',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 3
+  },
+  whiteBackground: {
+    width: 35,
+    height: 35,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 3
   },
   players: {
     backgroundColor: 'white',
@@ -571,13 +688,27 @@ const styles = StyleSheet.create({
   },
   bright: {
     color: '#FFFFFF',
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
+    fontFamily: "Inter_600SemiBold"
+  },
+  codes: {
+    flexDirection: 'row',
+    width: '85%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 'auto',
+    marginTop: 15
+  },
+  code: {
+    color: '#FFF',
+    textTransform: 'uppercase',
+    fontWeight: '600'
   },
   firstTab: {
-    backgroundColor: '#47814c'
+    backgroundColor: '#212121'
   },
   secondTab: {
-    backgroundColor: '#2d2d2d'
+    backgroundColor: '#ffffff'
   },
   boxes: {
     alignItems: 'center',
@@ -587,64 +718,115 @@ const styles = StyleSheet.create({
   },
   nBox: {
     width: 25,
-    height: 20,
-    borderColor: "#47814c",
+    height: 25,
+    backgroundColor: "#D9D9D9",
+    borderRadius: 25,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'space-evenly',
     flexDirection: 'row'
   },
   sBox: {
-    width: 25,
-    height: 20,
-    borderColor: "#47814c",
-    backgroundColor: "#47814c",
-    borderWidth: 1,
+    width: 24,
+    height: 24,
+    borderRadius: 24,
+    borderColor: '#FFE500',
+    borderWidth: 0.5,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
-    flexDirection: 'row'
+    justifyContent: 'center',
+    flexDirection: 'row',
+    overflow: 'hidden',
+    marginRight: 3
   },
   nText: {
     color: "#47814c"
   },
   sText: {
-    color: "#FFFFFF"
+    color: "#FFF",
+    textAlign: 'center',
+    fontSize: 12,
+    fontFamily: "Inter_600SemiBold"
   },
   matchInfo: {
     height: 80,
-    backgroundColor: "#212121",
+    backgroundColor: "transparent",
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: 10,
-    paddingVertical: 10
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+
   },
   info: {
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "flex-start",
+    marginRight: 2
   },
   blackBg: {
     backgroundColor: "#212121",
     borderRadius: 5,
     paddingHorizontal: 2,
+    width: 50,
     paddingVertical: 0,
     justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    bottom: 5
+    alignItems: "center"
   },
   whiteBg: {
-    backgroundColor: "#BBCF9B",
+    backgroundColor: "#FFF",
     borderRadius: 5,
-    paddingHorizontal: 5,
+    borderColor: "#00000033",
+    borderWidth: 1,
+    paddingHorizontal: 2,
+    width: 50,
     paddingVertical: 2,
     justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    bottom: 7
+    alignItems: "center"
   },
   black: {
     color: "#212121",
-    textTransform: "uppercase"
+    textTransform: "uppercase",
+    fontFamily: "Inter_600SemiBold"
+  },
+  header: {
+    backgroundColor: '#E4E4E4',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 10
+  },
+  name: {
+    fontFamily: 'Inter_600SemiBold'
+  },
+  selBy: {
+    fontFamily: 'Inter_500Medium',
+    color: '#7C7C7C'
+  },
+  image: {
+    width: '100%'
+  },
+  codeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: 100
+  },
+  redLine: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  redDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 7,
+    backgroundColor: '#DB7979'
+  },
+  redText: {
+    color: '#DB7979',
+    marginLeft: 4,
+    fontSize: 12,
+    textTransform: 'capitalize',
+    fontWeight: '600',
+    fontFamily: 'Inter_600SemiBold'
   }
 });

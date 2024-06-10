@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
@@ -20,41 +20,25 @@ export default function BottomBar({ navigation, route }: { navigation: any, rout
             <TouchableOpacity onPress={() => navigation.navigate('Home')}>
                 <View style={route.name == "Home" ? styles.selected : styles.iconContainer}>
                     <View style={{ marginBottom: 10 }}>
-                        <Icon name="home" color="#fff" size={20} />
+                        <Image source={require('../assets/home.png')} style={{ width: 24, height: 24 }} />
                     </View>
-                    <Text style={styles.textColor}>Home</Text>
+                    <Text style={route.name == "Home" ? styles.selectedColor : styles.textColor}>Home</Text>
                 </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('MyMatches', { userId: user?._id })}>
                 <View style={route.name == "MyMatches" ? styles.selected : styles.iconContainer}>
                     <View style={{ marginBottom: 10 }}>
-                        <Octicons name="database" color="#fff" size={20} />
+                        <Image source={require('../assets/ball.png')} style={{ width: 24, height: 24 }} />
                     </View>
-                    <Text style={styles.textColor}>My Matches</Text>
+                    <Text style={route.name == "MyMatches" ? styles.selectedColor : styles.textColor}>Matches</Text>
                 </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Post', { userId: user?._id })}>
                 <View style={route.name == "Post" ? styles.selected : styles.iconContainer}>
                     <View style={{ marginBottom: 10 }}>
-                        <AntIcon name="pluscircleo" color="#fff" size={20} />
+                        <Image source={require('../assets/mycontest.png')} style={{ width: 28, height: 28 }} />
                     </View>
-                    <Text style={styles.textColor}>Post</Text>
-                </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Community')}>
-                <View style={route.name == "Community" ? styles.selected : styles.iconContainer}>
-                    <View style={{ marginBottom: 10 }}>
-                        <IonicIcon name="people-outline" color="#fff" size={20} />
-                    </View>
-                    <Text style={styles.textColor}>Community</Text>
-                </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Winners')}>
-                <View style={route.name == "Winners" ? styles.selected : styles.iconContainer}>
-                    <View style={{ marginBottom: 10 }}>
-                        <AwesomeIcon name="medal" color="#fff" size={20} />
-                    </View>
-                    <Text style={styles.textColor}>Winners</Text>
+                    <Text style={route.name == "Post" ? styles.selectedColor : styles.textColor}>My Contest</Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -63,7 +47,7 @@ export default function BottomBar({ navigation, route }: { navigation: any, rout
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#3d7940',
+        backgroundColor: '#FFF',
         color: 'white',
         height: "10%",
         alignItems: 'center',
@@ -74,21 +58,21 @@ const styles = StyleSheet.create({
         bottom: "1%"
     },
     iconContainer: {
-        backgroundColor: '#3d7940',
-        color: 'white',
+        backgroundColor: '#FFF',
+        color: 'red',
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
         height: '100%',
-        width: w / 5
+        width: w / 3
     },
     selected: {
-        backgroundColor: '#000000',
+        backgroundColor: '#FFF',
         color: 'white',
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        width: w / 5,
+        width: w / 3,
         height: '100%'
     },
     match: {
@@ -166,6 +150,9 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     textColor: {
-        color: 'white'
+        color: '#666666'
+    },
+    selectedColor: {
+        color: '#CC4040'
     }
 });

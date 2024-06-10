@@ -82,7 +82,7 @@ export default function MyStackNavigator() {
                         <Stack.Screen name="Detail" component={DetailsScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="UserProfile" component={UserProfile} />
                         <Stack.Screen name="Post" component={Post} />
-                        <Stack.Screen name="Create" component={CreateTeam} />
+                        <Stack.Screen name="Create" component={CreateTeam} options={{ headerShown: false }}/>
                         <Stack.Screen name="Edit" component={EditTeam} />
                         <Stack.Screen name="Captain" component={SelectCaptain} />
                         <Stack.Screen name="ConDetail" component={ContestDetail} />

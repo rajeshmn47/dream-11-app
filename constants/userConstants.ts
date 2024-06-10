@@ -64,8 +64,8 @@ function geturl() {
     return "https://backendforpuand-dream11.onrender.com";
     //return "https://apk.thepowerplay.co";
   }
-  //return "https://backendforpuand-dream11.onrender.com";
-    return "http://192.168.8.175:8000";
+  return "https://backendforpuand-dream11.onrender.com";
+   // return "http://192.168.31.175:8000";
   //return "https://apk.thepowerplay.co";
 }
 

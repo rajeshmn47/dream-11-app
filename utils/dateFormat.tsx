@@ -39,6 +39,42 @@ export function getDisplayDate(date:any, sc:any, d:any) {
   return moment(date).format("DD MMM, HH:MM a");
 }
 
+export function getDisplayDate2(date:any, sc:any, d:any) {
+  const today = new Date(d);
+  const current = new Date(date);
+  today.setHours(0);
+  today.setMinutes(0);
+  today.setSeconds(0);
+  today.setMilliseconds(0);
+  current.setHours(0);
+  current.setMinutes(0);
+  current.setSeconds(0);
+  current.setMilliseconds(0); // month - 1 because January == 0
+  const diff = current.getTime() - today.getTime(); // get the difference between today(at 00:00:00) and the date
+  if (current.getTime() == today.getTime()) {
+    if (sc) {
+      const a = moment(date).format("HH:mm a");
+      return `Today`;
+    }
+    return "Today";
+  }
+  if (Math.abs(diff) < 24 * 60 * 60 * 1000 * 2 && diff > 0) {
+    const a = moment(date).format("HH:mm a");
+    return `Tommorrow`;
+  }
+  if (Math.abs(diff) < 24 * 60 * 60 * 1000 * 2 && diff < 0) {
+    const a = moment(date).format("HH:mm a");
+    return `Yesterday`;
+  }
+  if (
+    today.getDate() - current.getDate() < 7 &&
+    today.getMonth() == current.getMonth()
+  ) {
+    return moment(date).format("DD MMM"); // or format it what ever way you want
+  }
+  return moment(date).format("DD MMM");
+}
+
 export function sameDayorNot(a:any, b:any) {
   const first = new Date(a);
   const second = new Date(b);

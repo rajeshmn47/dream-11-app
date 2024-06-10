@@ -1,8 +1,21 @@
 import { useEffect, useState } from "react";
-import { getDisplayDate, hoursRemaining, isTommorrow, sameDayorNot } from "../utils/dateFormat";
-import { View,Text, StyleSheet } from "react-native";
+import { getDisplayDate, getDisplayDate2, hoursRemaining, isTommorrow, sameDayorNot } from "../utils/dateFormat";
+import { View, Text, StyleSheet } from "react-native";
+import {
+    useFonts,
+    Manrope_200ExtraLight,
+    Manrope_300Light,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
+} from '@expo-google-fonts/manrope';
 
 export function Timer({ matchDate }: { matchDate: any }) {
+    let [fontsLoaded] = useFonts({
+        Manrope_500Medium
+    });
     const [date, setDate] = useState<Date>(new Date());
     let c: any;
     useEffect(() => {
@@ -15,22 +28,24 @@ export function Timer({ matchDate }: { matchDate: any }) {
     }, []);
     return (
         <>
-            {sameDayorNot(new Date(), new Date(matchDate)) ||
-                isTommorrow(new Date(), new Date(matchDate)) ? (
-                <View style={styles.matchDate}>
-                    <Text style={styles.hours}>{hoursRemaining(matchDate, "k", new Date())}</Text>
-                    <Text style={styles.date}>
-                        {getDisplayDate(matchDate, "i", new Date()) &&
-                            getDisplayDate(matchDate, "i", new Date())}
-                    </Text>
-                </View>
-            ) : (
-                <View style={styles.matchDate}>
-                    <Text style={styles.date}>
-                        {getDisplayDate(matchDate, "i", c) && getDisplayDate(matchDate, "i", c)}
-                    </Text>
-                </View>
-            )}
+            {fontsLoaded?<View style={styles.container}>
+                {sameDayorNot(new Date(), new Date(matchDate)) ||
+                    isTommorrow(new Date(), new Date(matchDate)) ? (
+                    <View style={styles.matchDate}>
+                        <Text style={styles.date}>
+                            {getDisplayDate2(matchDate, "i", new Date()) &&
+                                getDisplayDate2(matchDate, "i", new Date())}
+                        </Text>
+                    </View>
+                ) : (
+                    <View style={styles.matchDate}>
+                        <Text style={styles.date}>
+                            {getDisplayDate2(matchDate, "i", c) && getDisplayDate2(matchDate, "i", c)}
+                        </Text>
+                    </View>
+                )}
+                <Text style={styles.hours}>{`${new Date(matchDate).getHours()}:${new Date(matchDate).getMinutes()}0 PM`}</Text>
+            </View>:null}
         </>
     )
 }
@@ -40,8 +55,8 @@ export function Timer({ matchDate }: { matchDate: any }) {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
-        color: 'white',
-        fontStyle: 'italic'
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     tabsContainer: {
         backgroundColor: 'white',
@@ -142,17 +157,19 @@ const styles = StyleSheet.create({
     },
     matchDate: {
         width: 130,
-        fontSize: 10,
         alignItems: 'center',
-        fontWeight: '200',
         justifyContent: 'center',
         alignContent: 'center'
     },
     date: {
-        fontWeight: "200",
-        fontSize: 12
+        fontWeight: "600",
+        fontSize: 12,
+        color: '#4B4E51',
+        fontFamily: 'Manrope_600SemiBold'
     },
     hours: {
-        fontWeight: "200"
+        fontSize: 12,
+        colors: '#4B4E51',
+        fontFamily: 'Manrope_600SemiBold'
     },
 })

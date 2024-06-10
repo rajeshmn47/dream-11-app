@@ -123,22 +123,14 @@ const EntryScreen = ({ navigation }: Props) => {
         <View style={styles.container}>
             <View style={styles.mainBody}>
                 <View style={{ alignItems: 'center' }}>
-                    <Image
-                        source={require('../../assets/background.jpg')}
-                        style={{
-                            width: '100%',
-                            height: 900,
-                            resizeMode: 'contain',
-                            margin: 30,
-                        }}
-                    />
+                    <Image source={{ uri: `https://s3-alpha-sig.figma.com/img/97df/3c46/1a7414b2e0bc76f1fe04bbf625928d68?Expires=1717372800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=n1a-2wu7QaBZRx9rm7r~n3ZtXqFvXajC2wq8tGAClnwW6cgVmCXMe0Oyj8YmbURd4-sIsGqHlZCatnj08ulUxtEJ5tBhUfq7J4xPRXeHsteoAwOa7H1cOnGe1tD7d5cFG~KAvReWC9oLMwnLwkdDbCS9IDEqIgygGCaQLR7Q5otn4XuIlp6t6rX5abOyCq93bB8lPiXfVexKThnr-m-yPAylfQa7KMO33uuFnBHP61M8noLDKCZl9398DIpi-mPG8SyrNoOGbmYdD~tQ5DR6A1Rajc~3d-h4BXF6grQ2Ft9hx5q5agGJM1WjdkHmLhNQlNXlQ~yunEnctJ~VTVmmVQ__` }} style={{ width: '100%', resizeMode: 'contain', height: 900 }} />
                 </View>
             </View>
             <View style={styles.bottom}>
                 <Button
                     onPress={() => navigation.navigate('Register')}
                     title="Register"
-                    color="#3f7a57"
+                    color="#CC4040"
                     accessibilityLabel="Learn more about this purple button"
                 />
                 <View style={styles.authContainer}>
@@ -164,7 +156,8 @@ export default EntryScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        height: 1000
+        height: 1000,
+        backgroundColor: '#FFF'
     },
     mainBody: {
         height: 60
@@ -174,7 +167,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         paddingHorizontal: 5,
-        width:w
+        width: w
     },
     SectionStyle: {
         flexDirection: 'row',

@@ -28,7 +28,7 @@ export type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 const LoginScreen = ({ navigation }: Props) => {
     const recaptchaVerifier: any = React.useRef(null);
     const appVerifier = recaptchaVerifier.current;
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('+91');
     const [otp, setOtp] = useState('');
     const [otpScreen, setOtpScreen]: any = useState(false);
     const [loading, setLoading] = useState(false);
@@ -51,7 +51,8 @@ const LoginScreen = ({ navigation }: Props) => {
             return;
         }
         setLoading(true);
-        let dataToSend: any = { phoneNumber: phoneNumber };
+        console.log(phoneNumber.slice(3, 13), 'phonenumber');
+        let dataToSend: any = { phoneNumber: phoneNumber.slice(3, 13) };
         let formBody: any = [];
         fetch(`${URL}/auth/phoneLogin`, {
             method: 'POST',
@@ -90,7 +91,7 @@ const LoginScreen = ({ navigation }: Props) => {
         }
         else {
             setLoading(true);
-            let dataToSend: any = { otp: otp, phoneNumber: phoneNumber };
+            let dataToSend: any = { otp: otp, phoneNumber: phoneNumber.slice(3, 13) };
             fetch(`${URL}/auth/verifyPhoneOtp`, {
                 method: 'POST',
                 body: JSON.stringify(dataToSend),
@@ -110,16 +111,12 @@ const LoginScreen = ({ navigation }: Props) => {
                         })
                     }
                     else {
-                        Toast.show({
-                            type: ALERT_TYPE.DANGER,
-                            title: 'Failure',
-                            textBody: responseJson.message,
-                            autoClose: 200
-                        })
+                        setErrortext(responseJson.message)
                     }
                 }).catch((error: any) => {
                     console.error(error)
                     console.log(error.response, 'err')
+                    setErrortext(error.response.data.message)
                     Toast.show({
                         type: ALERT_TYPE.DANGER,
                         title: 'Failure',
@@ -134,20 +131,32 @@ const LoginScreen = ({ navigation }: Props) => {
         }
     }
 
+    function isNumberValid() {
+        if (phoneNumber.length == 13) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     return (
         <AlertNotificationRoot>
             <View style={styles.mainBody}>
                 <Loader loading={loading} />
+                <Image source={{ uri: `https://s3-alpha-sig.figma.com/img/97df/3c46/1a7414b2e0bc76f1fe04bbf625928d68?Expires=1717372800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=n1a-2wu7QaBZRx9rm7r~n3ZtXqFvXajC2wq8tGAClnwW6cgVmCXMe0Oyj8YmbURd4-sIsGqHlZCatnj08ulUxtEJ5tBhUfq7J4xPRXeHsteoAwOa7H1cOnGe1tD7d5cFG~KAvReWC9oLMwnLwkdDbCS9IDEqIgygGCaQLR7Q5otn4XuIlp6t6rX5abOyCq93bB8lPiXfVexKThnr-m-yPAylfQa7KMO33uuFnBHP61M8noLDKCZl9398DIpi-mPG8SyrNoOGbmYdD~tQ5DR6A1Rajc~3d-h4BXF6grQ2Ft9hx5q5agGJM1WjdkHmLhNQlNXlQ~yunEnctJ~VTVmmVQ__` }} style={{ width: 180, height: 180 }} />
                 <ScrollView
                     keyboardShouldPersistTaps="handled"
                     keyboardDismissMode={'on-drag'}
                     contentContainerStyle={{
                         justifyContent: 'center',
-                        alignContent: 'center',
+                        alignContent: 'center'
                     }}>
                     <View>
                         {otpScreen ? <KeyboardAvoidingView enabled>
                             <View style={styles.SectionStyle}>
+                                <Text>Verify  your mobile number</Text>
+                                <Text>Enter OTP sent to {phoneNumber}</Text>
                                 <OtpInput numberOfDigits={6} onTextChange={(text) => setOtp(text)}
                                     theme={{
                                         containerStyle: styles.otpContainer,
@@ -164,13 +173,14 @@ const LoginScreen = ({ navigation }: Props) => {
                                 </Text>
                             ) : null}
                             <Text
-                                style={styles.registerTextStyle}
+                                style={{ ...styles.registerTextStyle, marginTop: 20 }}
                                 onPress={() => navigation.navigate('Register')}>
-                                New Here ? Register
+                                Didnt recieve OTP? Resend in 17s
                             </Text>
                         </KeyboardAvoidingView> :
                             <KeyboardAvoidingView enabled>
                                 <View style={styles.SectionStyle}>
+                                    <Text>Log in to craft your ultimate cricket team and dominate the league</Text>
                                     <TextInput
                                         style={styles.inputStyle}
                                         onChangeText={(phone) =>
@@ -178,6 +188,7 @@ const LoginScreen = ({ navigation }: Props) => {
                                         }
                                         placeholder="Enter Phone Number" //12345
                                         placeholderTextColor="#8b9cb5"
+                                        value={phoneNumber}
                                         keyboardType="default"
                                         ref={passwordInputRef}
                                         onSubmitEditing={Keyboard.dismiss}
@@ -193,7 +204,7 @@ const LoginScreen = ({ navigation }: Props) => {
                                     </Text>
                                 ) : null}
                                 <TouchableOpacity
-                                    style={styles.buttonStyle}
+                                    style={isNumberValid() ? styles.buttonStyle : styles.wrongButtonStyle}
                                     activeOpacity={0.5}
                                     onPress={handleSubmitPress}>
                                     <Text style={styles.buttonTextStyle}>Next</Text>
@@ -216,24 +227,43 @@ export default LoginScreen;
 const styles = StyleSheet.create({
     mainBody: {
         justifyContent: 'center',
-        alignContent: 'center'
+        alignContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "#FFF",
+        height: '100%'
     },
     SectionStyle: {
-        flexDirection: 'row',
-        height: 40,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 280,
+        height: 100,
         marginTop: 20,
         marginLeft: 35,
         marginRight: 35,
         margin: 10,
     },
-    buttonStyle: {
-        backgroundColor: '#40b46e',
+    wrongButtonStyle: {
+        backgroundColor: '#D9D9D9',
         borderWidth: 0,
         color: '#FFFFFF',
         borderColor: '#40b46e',
         height: 40,
         alignItems: 'center',
-        borderRadius: 30,
+        borderRadius: 5,
+        marginLeft: 35,
+        marginRight: 35,
+        marginTop: 20,
+        marginBottom: 25,
+    },
+    buttonStyle: {
+        backgroundColor: '#CC4040',
+        borderWidth: 0,
+        color: '#FFFFFF',
+        borderColor: '#40b46e',
+        height: 40,
+        alignItems: 'center',
+        borderRadius: 5,
         marginLeft: 35,
         marginRight: 35,
         marginTop: 20,
@@ -246,10 +276,13 @@ const styles = StyleSheet.create({
     },
     inputStyle: {
         flex: 1,
+        width: '100%',
+        height: 40,
+        marginTop: 20,
         paddingLeft: 15,
         paddingRight: 15,
         borderWidth: 1,
-        borderRadius: 30,
+        borderRadius: 5,
         borderColor: '#dadae8',
     },
     registerTextStyle: {
@@ -264,12 +297,14 @@ const styles = StyleSheet.create({
         color: 'red',
         textAlign: 'center',
         fontSize: 14,
+        marginTop: 15
     },
     otpContainer: {
         marginHorizontal: 'auto',
         flex: 1,
         justifyContent: 'space-evenly',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginVertical: 20
     },
     otpInputsContainer: {
 

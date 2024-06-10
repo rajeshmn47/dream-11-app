@@ -12,10 +12,24 @@ import { SceneMap, TabBar, TabBarItem, TabView } from 'react-native-tab-view';
 import { SvgUri } from 'react-native-svg';
 import { URL } from '../constants/userConstants';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import AntIcon from 'react-native-vector-icons/AntDesign'
+import { LinearGradient } from 'expo-linear-gradient'
 import Loader from './loader/Loader';
 import { Timer } from './Timer';
 import { RootStackParamList } from '../App';
 import PostItem, { Post } from './post/PostItem';
+import {
+    Manrope_200ExtraLight,
+    Manrope_300Light,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
+} from '@expo-google-fonts/manrope';
+import { useFonts, BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { hoursRemaining } from '../utils/dateFormat';
+
 
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Home">;
@@ -42,45 +56,41 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
             <View style={styles.match}>
                 <View style={styles.topBar}>
                     <Text numberOfLines={1} style={styles.title}>{data?.match_title}</Text>
-                    <Text style={styles.greenText}>{data?.lineups}</Text>
+                    <LinearGradient colors={['rgba(204, 64, 64, 0.14)', 'rgba(255, 255, 255, 0.14)']} style={styles.lineups}>
+                        <Text style={styles.redText}>LINEUPS OUT</Text>
+                        <Image source={require('../assets/cricket.png')} style={{ marginLeft: 10, width: 20, height: 20 }} />
+                    </LinearGradient>
                 </View>
                 <View style={styles.teamContainer}>
                     <View style={styles.team}>
-                        <View style={styles.imageContainer}>
-                            {/* <SvgUri
-                            onError={() =>
-                                console.log('error')
-                            }
-                            width="40"
-                            height="40"
-                            
-                            uri={data.teamHomeFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
-                        />*/}
-                        </View>
-                        <Text style={styles.code}>{data.home.code}</Text>
+                        <LinearGradient colors={['#ffffff', '#ffffff', '#ffffff']} start={{ x: 0, y: 0 }} end={{ x: 0.5, y: 0.5 }} style={styles.imageContainer}>
+                            <Image source={{ uri: `${data.teamHomeFlagUrl.replace('svg', 'png')}` }} style={{ width: 30, height: 40 }} />
+                        </LinearGradient>
+                        <Text style={{ ...styles.code }} numberOfLines={1}>{data.home.name}</Text>
                     </View>
                     <Timer matchDate={data?.date} />
                     <View style={styles.team}>
-                        <Text style={styles.code}>{data.away.code}</Text>
                         <View style={styles.imageContainer}>
-                            {/*<SvgUri
-                            onError={() =>
-                                console.log('error')
-                            }
-                            width="40"
-                            height="40"                         
-                            uri={data.teamAwayFlagUrl.replace("https://c8.alamy.com/comp/WKN91Y/illustration-of-a-cricket-sports-player-batsman-batting-front-view-set-inside-shield-WKN91Y.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Canada_(Pantone).svg")}
-                           />
-                        */}
+                            <Image source={{ uri: `${data.teamAwayFlagUrl.replace('svg', 'png')}` }} style={{ width: 30, height: 40 }} />
                         </View>
+                        <Text style={styles.code} numberOfLines={1}>{data.away.name}</Text>
+                    </View>
+                </View>
+                <View style={styles.timeLine}>
+                    <View style={styles.line}>
+                    </View>
+                    <Text style={styles.time}>
+                        {' '}
+                        {hoursRemaining(data?.date, 'date', date)&&<AntIcon name='clockcircleo' color='#CC4040' />}
+                        {' '}
+                        {hoursRemaining(data?.date, 'date', date)}{' '}</Text>
+                    <View style={styles.line}>
                     </View>
                 </View>
                 <View style={styles.bottom}>
                     <View style={styles.bottomLeft}>
                         <Mega />
-                        <Text style={{ fontWeight: "200" }}>₹59 Crores</Text>
                     </View>
-                    <Text style={styles.headings} numberOfLines={1}>{data?.home?.name} vs {data?.away?.name}</Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -93,6 +103,9 @@ const { height, width } = Dimensions.get('window');
 export default function HomeScreen({ navigation, route }: Props) {
     const dispatch: any = useDispatch();
     const { userToken, user } = useSelector((state: any) => state.user);
+    let [fontsLoaded] = useFonts({
+        BebasNeue_400Regular, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_200ExtraLight, Manrope_300Light
+    });
     const [text, setText] = useState('');
     const [upcoming, setUpcoming] = useState<any[]>();
     const [featuredPosts, setFeaturedPosts] = useState<any[]>();
@@ -106,7 +119,7 @@ export default function HomeScreen({ navigation, route }: Props) {
         { key: 'featured', title: 'Featured' },
         { key: 'upcoming', title: 'Upcoming' }]);
     const renderItem: ListRenderItem<Match> = ({ item }) => <Item data={item} date={new Date()} navigation={navigation} />;
-    const renderPost: ListRenderItem<Post> = ({ item }) => <PostItem data={item} date={new Date()} navigation={navigation} handleLike={handleLike} submitComment={submitComment}/>;
+    const renderPost: ListRenderItem<Post> = ({ item }) => <PostItem data={item} date={new Date()} navigation={navigation} handleLike={handleLike} submitComment={submitComment} />;
     useEffect(() => {
         if (user?._id) {
             refreshHandler();
@@ -119,7 +132,7 @@ export default function HomeScreen({ navigation, route }: Props) {
         setFeaturedPosts([...postResponse.data.posts])
     }
 
-    const submitComment = async (id: any, comment: any,setComment:any) => {
+    const submitComment = async (id: any, comment: any, setComment: any) => {
         API.post(`${URL}/addcomment/${id}`, { comment: comment });
         const postResponse = await API.get(`${URL}/allPosts`);
         setFeaturedPosts([...postResponse.data.posts]);
@@ -143,7 +156,7 @@ export default function HomeScreen({ navigation, route }: Props) {
     }
 
     const FirstRoute = () => (
-        <View style={{ flex: 1, backgroundColor: '#ffffff' }} >
+        <View style={{ backgroundColor: '#ffffff' }} >
             <View>
                 <View>
                     <FlatList
@@ -163,16 +176,12 @@ export default function HomeScreen({ navigation, route }: Props) {
     );
 
     const SecondRoute = () => (
-        <View style={{ flex: 1, backgroundColor: '#ffffff' }} >
-            <View>
-                <View>
-                    <FlatList
-                        data={upcoming}
-                        renderItem={renderItem}
-                        keyExtractor={(item: any) => item._id}
-                    />
-                </View>
-            </View>
+        <View style={{ backgroundColor: '#FFF' }} >
+            <FlatList
+                data={upcoming}
+                renderItem={renderItem}
+                keyExtractor={(item: any) => item._id}
+            />
         </View>
     );
 
@@ -182,47 +191,26 @@ export default function HomeScreen({ navigation, route }: Props) {
     });
 
     return (
-        <View style={styles.container}>
-            <Navbar navigation={navigation} />
-            <Loader loading={loading} />
-            <View style={styles.titleContainer}>
-                <Text style={styles.heading}>Upcoming Matches</Text>
-            </View>
-            <View style={styles.tabsContainer}>
-                <TabView
-                    navigationState={{ index, routes }}
-                    renderScene={renderScene}
-                    onIndexChange={(a) => setIndex(a)
-                    }
-                    initialLayout={{ width: layout.width }}
-                    overScrollMode={'auto'}
-                    renderTabBar={props => (
-                        <TabBar
-                            {...props}
-                            indicatorStyle={{ backgroundColor: 'black' }}
-                            tabStyle={{ width: width / 2 }}
-                            scrollEnabled={true}
-                            renderTabBarItem={(props) => (
-                                <View style={props.key == (index == 0 ? 'featured' : 'upcoming') ? styles.firstTab : styles.secondTab}>
-                                    <TabBarItem
-                                        {...props}
-                                        activeColor='white'
-                                        inactiveColor='black'
-                                    />
-                                </View>
-                            )}
-                        />
-                    )}
-                />
-            </View>
-            <BottomBar route={route} navigation={navigation} />
-        </View >
+        <>
+            {fontsLoaded ?
+                <View style={styles.container}>
+                    <Navbar navigation={navigation} />
+                    <Loader loading={loading} />
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.heading}>Upcoming</Text>
+                    </View>
+                    <View style={styles.tabsContainer}>
+                        <SecondRoute />
+                    </View>
+                    <BottomBar route={route} navigation={navigation} />
+                </View > : null}
+        </>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: '#FFF',
         color: 'white',
         fontStyle: 'italic',
         position: 'relative'
@@ -231,7 +219,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         color: 'white',
         zIndex: 0,
-        height: "86.66%",
+        height: "84.66%",
         width: "100%"
     },
     selectedTabTextStyle: {
@@ -248,23 +236,24 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         width: 40,
-        height: 40
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     match: {
-        shadowColor: 'black',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.3,
-        shadowRadius: 6,
-        elevation: 14,
         marginHorizontal: 10,
-        marginVertical: 15,
-        borderRadius: 10,
+        marginVertical: 10,
+        borderColor: '#D9D9D9',
+        borderWidth: 1,
         height: 160,
         backgroundColor: 'white',
-        overflow: "hidden"
+        overflow: "hidden",
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 0.5 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 1,
+        borderRadius: 3
     },
     postTop: {
         height: 40,
@@ -293,7 +282,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         color: 'white',
-        flexDirection: 'row',
+        flexDirection: 'column',
         height: 60,
         padding: 0,
         width: 103
@@ -328,14 +317,23 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row',
-        paddingHorizontal: 10,
-        paddingVertical: 5
+        paddingLeft: 10,
+        height: 30,
+        backgroundColor: 'rgba(26, 37, 136, 0.06)'
     },
     greenText: {
         overflow: 'hidden',
         fontSize: 18,
         fontWeight: '600',
         color: "#398d44"
+    },
+    redText: {
+        overflow: 'hidden',
+        fontSize: 16,
+        fontWeight: '400',
+        color: "#CC4040",
+        textTransform: 'uppercase',
+        fontFamily: 'BebasNeue_400Regular'
     },
     matchTop: {
         borderBottomColor: '#DDDDDD',
@@ -366,9 +364,11 @@ const styles = StyleSheet.create({
         color: 'rgb(130, 130, 130)'
     },
     title: {
-        width: "70%",
+        width: "60%",
         fontSize: 14,
-        fontWeight: '200'
+        fontWeight: '600',
+        color: '#474C52',
+        fontFamily: 'Manrope_600SemiBold'
     },
     headings: {
         width: "50%",
@@ -378,36 +378,63 @@ const styles = StyleSheet.create({
         textAlign: "right"
     },
     titleContainer: {
-        backgroundColor: "#e7e7e7",
         marginBottom: 0,
-        paddingVertical: 5,
+        paddingBottom: 0,
+        paddingTop: 24,
         paddingHorizontal: 15,
-        height: "5%"
+        height: "6%"
         //alignItems: 'center',
         //justifyContent: 'center'
     },
     heading: {
         overflow: 'hidden',
-        fontSize: 18,
-        fontWeight: '200',
-        backgroundColor: "transparent"
+        fontSize: 20,
+        fontWeight: '400',
+        backgroundColor: "transparent",
+        fontFamily: 'BebasNeue_400Regular',
+        textTransform: "uppercase",
+        color: "#000000"
     },
     code: {
         overflow: 'hidden',
-        fontSize: 14,
-        fontWeight: 'bold'
+        fontSize: 12,
+        fontWeight: '400',
+        color: '#474C52',
+        textTransform: 'capitalize',
+        fontFamily: 'Manrope_400Regular'
     },
     bottom: {
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row",
-        backgroundColor: "#fafafa",
-        padding: 10
+        paddingBottom: 10,
+        paddingHorizontal: 10
     },
     bottomLeft: {
         width: 130,
         justifyContent: "space-between",
         alignItems: "center",
         flexDirection: "row"
+    },
+    timeLine: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginTop: 5
+    },
+    line: {
+        height: 1,
+        width: '40%',
+        backgroundColor: '#F0F1F3'
+    },
+    time: {
+        color: '#CC4040'
+    },
+    lineups: {
+        width: '40%',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        paddingHorizontal: 10,
+        paddingVertical: 5
     }
 });
