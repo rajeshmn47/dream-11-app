@@ -9,26 +9,11 @@ import axios from "axios";
 import { styles } from './detailscreen/stylesheet';
 import { RootStackParamList } from './../App';
 import { getmatch } from "../actions/matchAction";
-import { getDatabase, onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useWindowDimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
 import AntIcon from 'react-native-vector-icons/AntDesign';
-import IonicIcon from 'react-native-vector-icons/Ionicons';
-import {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    onSnapshot,
-    orderBy,
-    query,
-    setDoc,
-    updateDoc,
-    where,
-} from "firebase/firestore";
-import db from "../firebase/config";
 import Overview from './topbar/Overview';
 import { URL } from '../constants/userConstants';
 import { checkar, checkwk, getPlayerName } from '../utils/playersFilter';
@@ -147,37 +132,6 @@ export default function DetailsScreen({ navigation, route }: Props) {
             }
         }
         getMatch();
-    }, [route.params.matchId]);
-
-    useEffect(() => {
-        async function getdata() {
-            if (route.params.matchId) {
-                const docRef = doc(db, "commentary", route.params.matchId);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                } else {
-                    // docSnap.data() will be undefined in this case
-                }
-                const unsub = onSnapshot(
-                    doc(db, "commentary", route.params.matchId),
-                    (doc: any) => {
-                        if (doc.data()) {
-                            if (doc.data()?.commentary?.reverse()?.length > 0) {
-                                setCommentary([...doc.data().commentary?.reverse()]);
-                            }
-                            if (doc?.data()?.miniscore) {
-                                console.log(doc?.data()?.miniscore, 'checklivescore');
-                                setLivescore({ ...doc?.data()?.miniscore });
-                            }
-                        }
-                    }
-                );
-            }
-        }
-        getdata();
-        // onSnapshot((docRef, "cities"), (snapshot) => {
-        // let array = []; // Get users all recent talks and render that in leftColumn content
-        // });
     }, [route.params.matchId]);
 
     useEffect(() => {

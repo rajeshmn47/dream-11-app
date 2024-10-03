@@ -49,25 +49,11 @@ export const DELETE_USER_REQUEST = "DELETE_USER_REQUEST";
 export const DELETE_USER_SUCCESS = "DELETE_USER_SUCCESS";
 export const DELETE_USER_FAIL = "DELETE_USER_FAIL";
 export const DELETE_USER_RESET = "DELETE_USER_RESET";
-
 export const CLEAR_ERRORS = "CLEAR_ERRORS";
-
 export const RESTORE_TOKEN = "RESTORE_TOKEN";
-
 export const IMG_LEFT = "https://firebasestorage.googleapis.com/v0/b/dreamelevenclone.appspot.com/o/images%2F";
 export const IMG_RIGHT = ".png?alt=media&token=4644f151-3dfd-4883-9398-4191bed34854";
-
-function geturl() {
-  const current = process.env.REACT_APP_API;
-  if (current == "local") {
-    //return "http://192.168.234.175:8000";
-    return "https://backendforpuand-dream11.onrender.com";
-    //return "https://apk.thepowerplay.co";
-  }
-  return "https://backendforpuand-dream11.onrender.com";
-   // return "http://192.168.31.175:8000";
-  //return "https://apk.thepowerplay.co";
-}
+export const URL="https://dreamelevenclonebackend.onrender.com";
 
 function getfrontendurl() {
   const current = process.env.REACT_APP_API;
@@ -77,5 +63,4 @@ function getfrontendurl() {
   return "https://dream-11-clone-mern-stack.vercel.app";
 }
 
-export const URL = geturl();
 export const FURL = getfrontendurl();

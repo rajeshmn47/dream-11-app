@@ -29,13 +29,11 @@ const API_NEW = axios.create({ baseURL: `${URL}` });
 // const API_NEW = axios.create({ baseURL: 'http://54.84.192.90:8081/api' });
 
 API.interceptors.request.use(async (req:any) => {
-  if (await AsyncStorage.getItem("server_token")) {
-    const servertoken = await AsyncStorage.getItem("server_token");
-    req.headers.Authorization = `Bearer ${servertoken}`;
-    req.headers.servertoken = servertoken;
-    req.headers.ContentType = "application/json";
-  }
-  return req;
+  const servertoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2NWQxOGE4YWI5MDE1MTQ3ZDE2Nzc1YmYiLCJpYXQiOjE3MjAwNjc4MjgsImV4cCI6MTc1MDA2NzgyOH0.OhlljUvsTOdrKNbci5dX_U4IUGuCAobntz_37tW2_PA";
+  req.headers.Authorization = `Bearer ${servertoken}`;
+  req.headers.servertoken = servertoken;
+  req.headers.ContentType = "application/json";
+return req;
 });
 
 const headers = {

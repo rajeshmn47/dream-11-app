@@ -8,14 +8,12 @@ import FastImage from 'react-native-fast-image';
 import SvgUri from 'react-native-svg-uri';
 import axios from "axios";
 import { getDisplayDate } from '../../utils/dateFormat';
-import HomeScreen from '../HomeScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 import DetailsScreen from '../DetailsScreen';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RootStackParamList } from '../HomeScreen';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -29,6 +27,7 @@ import ContestDetail from '../ContestDetail';
 import BottomTabNavigator from '../navigation/TabNavigator';
 import DrawerNavigator from '../navigation/DrawerNavigator';
 import MyStackNavigator from '../navigation/MyStackNavigator';
+import { RootStackParamList } from '../../App';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -97,7 +96,7 @@ export default function Routes() {
     return (
         <>
             <NavigationContainer independent={true}>
-                <MyStackNavigator/>
+                <MyStackNavigator />
             </NavigationContainer>
         </>
     );

@@ -1,23 +1,14 @@
-import { Dimensions, RefreshControl, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { Button, Dimensions, RefreshControl, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { Text, FlatList, TextInput, View, Image, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ListRenderItem } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { API, loadToken, logout } from '../actions/userAction';
-import { useDispatch, useSelector } from 'react-redux';
-import Navbar from './navbar/Navbar';
-import BottomBar from './BottomBar';
-import Mega from "./homescreen/Mega";
-import { SceneMap, TabBar, TabBarItem, TabView } from 'react-native-tab-view';
-import { SvgUri } from 'react-native-svg';
-import { URL } from '../constants/userConstants';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AntIcon from 'react-native-vector-icons/AntDesign'
-import { LinearGradient } from 'expo-linear-gradient'
+import { URL } from '../constants/userConstants';
 import Loader from './loader/Loader';
-import { Timer } from './Timer';
-import { RootStackParamList } from '../App';
-import PostItem, { Post } from './post/PostItem';
+import axios from 'axios';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFonts, BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { LinearGradient } from 'expo-linear-gradient'
 import {
     Manrope_200ExtraLight,
     Manrope_300Light,
@@ -27,16 +18,19 @@ import {
     Manrope_700Bold,
     Manrope_800ExtraBold,
 } from '@expo-google-fonts/manrope';
-import { useFonts, BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { RootStackParamList } from './../App';
+import Navbar from './navbar/Navbar';
+import BottomBar from './BottomBar';
+import Mega from './homescreen/Mega';
+import { Timer } from './Timer';
 import { hoursRemaining } from '../utils/dateFormat';
-
-
+import { API } from '../actions/userAction';
 
 export type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
-
 export interface Match {
     id: string;
+    username: string,
     match_title: string;
     home: any;
     away: any;
@@ -48,11 +42,11 @@ export interface Match {
 }
 
 const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: any }) => {
-    const openPopup = () => {
-        navigation.navigate('Detail', { matchId: data.id })
+    const handleClick = () => {
+        navigation.navigate("Details", { matchId: data?.id })
     }
     return (
-        <TouchableOpacity onPress={() => openPopup()}>
+        <TouchableOpacity onPress={() => handleClick()}>
             <View style={styles.match}>
                 <View style={styles.topBar}>
                     <Text numberOfLines={1} style={styles.title}>{data?.match_title}</Text>
@@ -64,14 +58,14 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                 <View style={styles.teamContainer}>
                     <View style={styles.team}>
                         <LinearGradient colors={['#ffffff', '#ffffff', '#ffffff']} start={{ x: 0, y: 0 }} end={{ x: 0.5, y: 0.5 }} style={styles.imageContainer}>
-                            <Image source={{ uri: `${data.teamHomeFlagUrl.replace('svg', 'png')}` }} style={{ width: 30, height: 40 }} />
+                            <Image source={{ uri: `${data.teamHomeFlagUrl.replace('svg', 'png')}` }} style={{ width: 50, height: 40 }} />
                         </LinearGradient>
                         <Text style={{ ...styles.code }} numberOfLines={1}>{data.home.name}</Text>
                     </View>
                     <Timer matchDate={data?.date} />
                     <View style={styles.team}>
                         <View style={styles.imageContainer}>
-                            <Image source={{ uri: `${data.teamAwayFlagUrl.replace('svg', 'png')}` }} style={{ width: 30, height: 40 }} />
+                            <Image source={{ uri: `${data.teamAwayFlagUrl.replace('svg', 'png')}` }} style={{ width: 50, height: 40 }} />
                         </View>
                         <Text style={styles.code} numberOfLines={1}>{data.away.name}</Text>
                     </View>
@@ -81,7 +75,7 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
                     </View>
                     <Text style={styles.time}>
                         {' '}
-                        {hoursRemaining(data?.date, 'date', date)&&<AntIcon name='clockcircleo' color='#CC4040' />}
+                        {hoursRemaining(data?.date, 'date', date) && <AntIcon name='clockcircleo' color='#CC4040' />}
                         {' '}
                         {hoursRemaining(data?.date, 'date', date)}{' '}</Text>
                     <View style={styles.line}>
@@ -97,16 +91,13 @@ const Item = ({ data, date, navigation }: { data: Match, date: any, navigation: 
     );
 }
 
-
 const { height, width } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation, route }: Props) {
-    const dispatch: any = useDispatch();
-    const { userToken, user } = useSelector((state: any) => state.user);
+    const [text, setText] = useState('');
     let [fontsLoaded] = useFonts({
         BebasNeue_400Regular, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_200ExtraLight, Manrope_300Light
     });
-    const [text, setText] = useState('');
     const [upcoming, setUpcoming] = useState<any[]>();
     const [featuredPosts, setFeaturedPosts] = useState<any[]>();
     const [completed, setCompleted] = useState<any[]>([])
@@ -119,64 +110,28 @@ export default function HomeScreen({ navigation, route }: Props) {
         { key: 'featured', title: 'Featured' },
         { key: 'upcoming', title: 'Upcoming' }]);
     const renderItem: ListRenderItem<Match> = ({ item }) => <Item data={item} date={new Date()} navigation={navigation} />;
-    const renderPost: ListRenderItem<Post> = ({ item }) => <PostItem data={item} date={new Date()} navigation={navigation} handleLike={handleLike} submitComment={submitComment} />;
+
     useEffect(() => {
-        if (user?._id) {
-            refreshHandler();
-        }
-    }, [user]);
-
-    const handleLike = async (i: any) => {
-        await API.get(`${URL}/like/${i}`);
-        const postResponse = await API.get(`${URL}/allPosts`);
-        setFeaturedPosts([...postResponse.data.posts])
-    }
-
-    const submitComment = async (id: any, comment: any, setComment: any) => {
-        API.post(`${URL}/addcomment/${id}`, { comment: comment });
-        const postResponse = await API.get(`${URL}/allPosts`);
-        setFeaturedPosts([...postResponse.data.posts]);
-        setComment('')
-    }
+        refreshHandler()
+    }, [])
 
     async function refreshHandler() {
         setRefreshing(true);
         try {
             const response = await API.get(`${URL}/homeMatches`);
-            const a: [] = response.data.upcoming.results.filter((m: any) => new Date() < new Date(m.date)).sort(
-                (c: any, d: any) => new Date(c.date).valueOf() - new Date(d.date).valueOf()
-            );
+            console.log(response.data.past.results, 'response')
+            const a: [] = response.data.upcoming.results
             setUpcoming([...a]);
             setRefreshing(false);
-            const postResponse = await API.get(`${URL}/allPosts`);
-            setFeaturedPosts([...postResponse.data.posts])
         } catch (error) {
+            console.log(error, 'error')
             setRefreshing(false);
         }
     }
 
-    const FirstRoute = () => (
-        <View style={{ backgroundColor: '#ffffff' }} >
-            <View>
-                <View>
-                    <FlatList
-                        data={featuredPosts}
-                        renderItem={renderPost}
-                        keyExtractor={(item: any) => item._id}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={refreshing ? true : false}
-                                onRefresh={refreshHandler}
-                            />
-                        }
-                    />
-                </View>
-            </View>
-        </View>
-    );
-
     const SecondRoute = () => (
-        <View style={{ backgroundColor: '#FFF' }} >
+        <View style={{ backgroundColor: '#FFF' }
+        } >
             <FlatList
                 data={upcoming}
                 renderItem={renderItem}
@@ -185,14 +140,9 @@ export default function HomeScreen({ navigation, route }: Props) {
         </View>
     );
 
-    const renderScene = SceneMap({
-        featured: FirstRoute,
-        upcoming: SecondRoute
-    });
-
     return (
         <>
-            {fontsLoaded ?
+           {fontsLoaded ?
                 <View style={styles.container}>
                     <Navbar navigation={navigation} />
                     <Loader loading={loading} />

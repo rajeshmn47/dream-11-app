@@ -30,7 +30,7 @@ const LoginScreen = ({ navigation }: Props) => {
     const appVerifier = recaptchaVerifier.current;
     const [phoneNumber, setPhoneNumber] = useState('+91');
     const [otp, setOtp] = useState('');
-    const [otpScreen, setOtpScreen]: any = useState(false);
+    const [otpScreen, setOtpScreen]: any = useState(true);
     const [loading, setLoading] = useState(false);
     const [errortext, setErrortext] = useState('');
     const passwordInputRef: any = createRef();
@@ -91,7 +91,7 @@ const LoginScreen = ({ navigation }: Props) => {
         }
         else {
             setLoading(true);
-            let dataToSend: any = { otp: otp, phoneNumber: phoneNumber.slice(3, 13) };
+            let dataToSend: any = { otp: otp, phoneNumber: 9380899596 };
             fetch(`${URL}/auth/verifyPhoneOtp`, {
                 method: 'POST',
                 body: JSON.stringify(dataToSend),
